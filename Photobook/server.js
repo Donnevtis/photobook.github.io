@@ -1,8 +1,15 @@
 'use strict';
-var http = require('http');
-var port = process.env.PORT || 1337;
+const express = require('express');
+const app = express();
 
-http.createServer(function (req, res) {
-    res.writeHead(200, { 'Content-Type': 'text/plain' });
-    res.end('Hello World\n');
-}).listen(port);
+app.use(express.static('public'));
+
+app.get('/', function (req, res) {
+    res.sendFile(__dirname + '/index.html');
+})
+
+
+const listener = app.listen(1337, function () {
+    console.log('Your app is listening on port ' + listener.address() + '1337');
+});
+
