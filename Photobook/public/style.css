@@ -448,6 +448,8 @@
             grid-template-columns: repeat(4, 1fr);
             grid-template-rows: repeat(2, 12.5vw);
             width: 100%;
+            overflow: hidden;
+            max-height: calc(12.5vw + 12.5vw + 40px);
         }
         
         .album-cell {

@@ -3,6 +3,21 @@ const slider = document.querySelector('.scale__slider');
 const fillLine = document.querySelector('.scale_slider-fill');
 const photoGrid = document.querySelectorAll('.album__grid');
 
+// window.addEventListener('load', delCells);
+
+// function delCells() {
+
+//     photoGrid.forEach(elem => {
+//         if (elem.children.length > 8) {
+//             let num = elem.children.length;
+//             for (let i = 8; i < num; ++i) {
+//                 elem.children[8].remove();
+//             }
+//         }
+
+//     })
+
+// }
 
 slider.addEventListener('input', lineSetPos);
 
@@ -42,18 +57,21 @@ function gridScale(e) {
 
     function setGrid(col, vw) {
 
+
         let r = 2;
 
-        photoGrid.forEach(element => {
+        photoGrid.forEach(elem => {
+
             if (col == 5 || col == 6) {
-                r = (element.children.length / col);
+                r = (elem.children.length / col);
                 r = Math.ceil(r);
             }
-            element.style.gridTemplateColumns = `repeat(${col},1fr)`;
-            element.style.gridTemplateRows = `repeat(${r} ,${vw}vw)`;
+            elem.style.overflow = 'visible';
+            elem.style.maxHeight = 'none';
+            elem.style.gridTemplateColumns = `repeat(${col},1fr)`;
+            elem.style.gridTemplateRows = `repeat(${r} ,${vw}vw)`;
 
         });
-
-
     }
+
 }
