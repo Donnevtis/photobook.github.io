@@ -1,23 +1,11 @@
-//scale slider fill
 const slider = document.querySelector('.scale__slider');
 const fillLine = document.querySelector('.scale_slider-fill');
 const photoGrid = document.querySelectorAll('.album__grid');
+const sidebarButton = document.querySelector('.sidebar-button');
+const sidebar = document.querySelector('.sidebar');
+const content = document.querySelector('.content');
 
-// window.addEventListener('load', delCells);
 
-// function delCells() {
-
-//     photoGrid.forEach(elem => {
-//         if (elem.children.length > 8) {
-//             let num = elem.children.length;
-//             for (let i = 8; i < num; ++i) {
-//                 elem.children[8].remove();
-//             }
-//         }
-
-//     })
-
-// }
 
 slider.addEventListener('input', lineSetPos);
 
@@ -74,4 +62,32 @@ function gridScale(e) {
         });
     }
 
+}
+
+sidebarButton.addEventListener('click', openSidebar);
+
+
+function openSidebar() {
+
+    sidebar.classList.add('sidebar_hide');
+    content.style.display = 'flex';
+
+    sidebarButton.removeEventListener('click', openSidebar);
+    sidebarButton.addEventListener('click', closeSidebar);
+}
+
+function closeSidebar() {
+
+
+    sidebar.classList.remove('sidebar_hide');
+
+
+
+
+    content.style.display = 'none';
+
+
+
+    sidebarButton.removeEventListener('click', closeSidebar);
+    sidebarButton.addEventListener('click', openSidebar);
 }
