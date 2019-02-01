@@ -1,0 +1,9 @@
+{
+  "name": "photobook",
+  "version": "0.0.0",
+  "description": "Photobook",
+  "main": "server.js",
+  "author": {
+    "name": ""
+  }
+}
