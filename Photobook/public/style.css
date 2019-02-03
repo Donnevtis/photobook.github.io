@@ -64,28 +64,45 @@
         /* sidebar */
         
         .sidebar-button {
+            display: none;
             position: fixed;
             z-index: 5;
-            width: 24px;
-            height: 60px;
+            width: 10px;
             background: transparent;
             border-radius: 10px;
-            top: calc(50vh - 50px);
-            left: 90vw;
-            padding: 0 20px;
+            bottom: calc(50vh - 50px);
+            right: 5px;
             font-size: 50px;
-            display: none;
+        }
+        
+        .sidebar-button__line {
+            width: 4px;
+            height: 100px;
+            background: #a3a2a8;
+            border-radius: 5px;
+            opacity: 0.7;
+            margin: 0 auto;
+        }
+        
+        .sidebar-button__line:active,
+        .left_bar:focus {
+            opacity: 1;
         }
         
         .sidebar {
             display: block;
             background-color: rgb(30, 29, 38);
             position: sticky;
+            position: -webkit-sticky;
             left: 0px;
             top: 0px;
             width: 220px;
-            height: 100vh;
+            height: 100vmax;
             z-index: 2;
+        }
+        
+        .sidebar_hide {
+            transform: translateX(-100vw);
         }
         
         .top {
@@ -144,7 +161,7 @@
             top: 67px;
             width: 160px;
             height: 36px;
-            z-index: 1;
+            z-index: 3;
             font-size: 15px;
             font-family: "Helvetica Neue";
             color: rgb(255, 255, 255);
@@ -156,7 +173,7 @@
         .search {
             display: flex;
             align-items: center;
-            justify-content: space-between;
+            justify-content: start;
             position: relative;
             left: 0px;
             width: 100%;
@@ -243,8 +260,11 @@
             transition: all .2s ease;
         }
         
-        .menu__option:hover {
+        .menu__option:hover .checkmark {
             background-color: #19181e;
+        }
+        
+        .menu__option:hover {
             color: rgb(214, 213, 223);
         }
         
@@ -405,11 +425,7 @@
             padding: 30;
         }
         
-        .sidebar_hide {
-            transform: translateX(-100vw);
-        }
-        
-        @media (max-width: 768px) {
+        @media screen and (max-width: 425px) {
             .sidebar-button {
                 display: block;
             }
@@ -419,6 +435,7 @@
             .sidebar {
                 position: absolute;
                 width: 100vw;
+                height: 100vmax;
                 transition: transform .3s ease;
             }
             .scale {
@@ -426,6 +443,43 @@
             }
             .content {
                 display: none;
+            }
+            .top {
+                height: 200px;
+                display: grid;
+                grid-template: 1fr 1fr/1fr 2fr;
+                justify-items: center;
+                align-items: center;
+                padding: 20px;
+                grid-gap: 10px 10px;
+            }
+            .profile__avatar {
+                top: 0;
+                width: 70px;
+                height: 70px;
+                grid-column-start: 1;
+                grid-row-start: 1;
+                margin: 0;
+            }
+            .profile__name {
+                justify-self: start;
+                margin: 0;
+                top: -12px;
+                grid-column-start: 2;
+                grid-row-start: 1;
+            }
+            .profile__count {
+                justify-self: start;
+                grid-column-start: 2;
+                grid-row-start: 1;
+                top: 8px;
+            }
+            .upload-button {
+                grid-row-start: 2;
+                grid-column: 1/ span 2;
+                top: 0px;
+                width: 160px;
+                height: 36px;
             }
         }
         
@@ -480,8 +534,6 @@
             grid-template-columns: repeat(4, 1fr);
             grid-template-rows: repeat(2, 12.5vw);
             width: 100%;
-            overflow: hidden;
-            max-height: calc(12.5vw + 12.5vw + 40px);
         }
         
         .album-cell {

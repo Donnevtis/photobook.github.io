@@ -5,7 +5,7 @@ const sidebarButton = document.querySelector('.sidebar-button');
 const sidebar = document.querySelector('.sidebar');
 const content = document.querySelector('.content');
 
-
+window.onload = setGrid(4, 12.5);
 
 slider.addEventListener('input', lineSetPos);
 
@@ -43,24 +43,55 @@ function gridScale(e) {
             break;
     }
 
-    function setGrid(col, vw) {
+
+}
+
+function setGrid(col, vw) {
 
 
-        let r = 2;
+    let r = 2;
 
-        photoGrid.forEach(elem => {
+    photoGrid.forEach(elem => {
 
-            if (col == 5 || col == 6) {
-                r = (elem.children.length / col);
+        let cells = elem.children;
+
+        for (const cell of cells) {
+            cell.style.display = 'block'
+        }
+
+
+
+        if (col <= 4) {
+
+            if (cells.length > col * 2) {
+
+                for (let i = col * 2; i < cells.length; i++) {
+                    cells[i].style.display = 'none';
+                }
+
+            }
+
+        } else if (col == 5 || col == 6) {
+            r = 3;
+
+            if (cells.length > col * 3) {
+                for (let i = col * 3; i < cells.length; i++) {
+                    cells[i].style.display = 'none';
+                }
+
+            } else {
+                r = (cells.length / col);
                 r = Math.ceil(r);
             }
-            elem.style.overflow = 'visible';
-            elem.style.maxHeight = 'none';
-            elem.style.gridTemplateColumns = `repeat(${col},1fr)`;
-            elem.style.gridTemplateRows = `repeat(${r} ,${vw}vw)`;
 
-        });
-    }
+        }
+
+
+
+        elem.style.gridTemplateColumns = `repeat(${col},1fr)`;
+        elem.style.gridTemplateRows = `repeat(${r} ,${vw}vw)`;
+
+    });
 
 }
 
@@ -80,13 +111,7 @@ function closeSidebar() {
 
 
     sidebar.classList.remove('sidebar_hide');
-
-
-
-
     content.style.display = 'none';
-
-
 
     sidebarButton.removeEventListener('click', closeSidebar);
     sidebarButton.addEventListener('click', openSidebar);
