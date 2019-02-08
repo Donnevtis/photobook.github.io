@@ -1,0 +1,14 @@
+extends layout
+
+block content          
+      .sidebar
+        form.form-signup(method='POST' action='/user/login')
+          .form-signup__title Sign in
+          div(class=`form-signup__input-title ${name}`) Username
+          input.form-signup__input(type='text', name='username', placeholder='Username...')        
+          div(class=`form-signup__input-title ${password}`) Password
+          input.form-signup__input(type='password', name='password')          
+          .buttons
+            input.signup(type='submit', value='Sign in')
+            button.signin Sign up →
+      .background

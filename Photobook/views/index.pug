@@ -1,0 +1,51 @@
+extends layout
+
+block content  
+  body
+    button.sidebar-button(type='button')
+      .sidebar-button__line
+    .sidebar
+      .top
+        img.profile__avatar(src='photo/2019-01-31_21-18-40.png', alt='avatar')
+        .profile__name Amelia Rice
+        .profile__count 2390 files
+        button.upload-button(type='button') upload
+      .search
+        img.search__forma(src='svg/Search.svg', alt='svg')
+        input.search__input(type='text', placeholder='Search files')
+      .menu
+        .menu__title Categories
+        label.menu__option
+          | Photos
+          input.menu__input(type='radio', name='categories', checked='checked')
+          span.checkmark
+        label.menu__option
+          | Videos
+          input.menu__input(type='radio', name='categories')
+          span.checkmark
+        label.menu__option
+          | Projects
+          input.menu__input(type='radio', name='categories')
+          span.checkmark
+      .menu
+        .menu__title
+          | albums
+          svg.menu__button(shape-rendering='crispEdges', version='1.1', xmlns='http://www.w3.org/2000/svg', xmlns:xlink='http://www.w3.org/1999/xlink', x='0px', y='0px', viewBox='0 0 20 20', style='enable-background:new 0 0 20 20;', xml:space='preserve')
+            style(type='text/css').
+              .st1{fill:#EA5A5A;}
+            rect.st1(x='9', y='4', width='2', height='12')
+            rect.st1(x='4', y='9', width='12', height='2')
+        .menu__options.menu__options_sticky         
+            input.menu__new-album(type='text', name='title', placeholder='enter the name')           
+      .scale
+        .scale__grid-small
+        div
+          input.scale__slider(type='range', min='0', max='100', step='25')
+          .scale_slider-fill
+        .scale__grid-large
+    .content
+        .actions
+          img.slideshow-button(src='svg/slideshowButton.svg')
+          img.share-button(src='svg/shareButton.svg')
+        if user  
+          img.logout-button(src='svg/logout.svg')
