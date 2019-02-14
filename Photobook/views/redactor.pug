@@ -1,0 +1,19 @@
+
+.avatar-changer
+  .photo-redactor
+    img.photo-redactor__img_fade(src=avatar, alt='')
+    .photo-redactor__cropper
+      .photo-redactor__cropper.photo-redactor__cropper_circle
+        img.photo-redactor__img(src=avatar, alt='')
+      .photo-redactor__thumb.photo-redactor__thumb_LT
+      .photo-redactor__thumb.photo-redactor__thumb_RT
+      .photo-redactor__thumb.photo-redactor__thumb_LB
+      .photo-redactor__thumb.photo-redactor__thumb_RB
+  .upload-avatar-area
+    label.avatar-upload-button.upload-button
+      input.inputfile(type='file', name='file', accept='.jpg, .jpeg, .png')
+      | Select file
+    .avatar-drop-area.upload-area DROP FILE
+    label.avatar-upload-button.upload-button
+      input.inputfile(type='submit')
+      | Submit

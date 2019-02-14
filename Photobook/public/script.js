@@ -8,8 +8,42 @@ const uploadButton = document.querySelector('.upload-button');
 const menuButton = document.querySelector('.menu__button');
 const newAlButton = document.querySelector('.menu__new-album');
 const logout = document.querySelector('.logout-button');
-const singupButton = document.querySelector('.signup ');
 let areas = [];
+
+// Fetch methods
+function fetchGet(url, callback) {
+    fetch('redactor', { method: 'GET' })
+        .then((res) => {
+            if (res.status !== 200) {
+                console.warn(`Looks like a problem. Status Code: ${res.status}`);
+                return;
+            } else {
+                return res.text();
+            }
+        })
+        .then(callback);
+
+}
+
+function uploadFile(file, url, callback) {
+    let formData = new FormData()
+    formData.append('file', file)
+    fetch(url, {
+            method: 'POST',
+            body: formData
+        })
+        .then((res) => {
+            if (res.status !== 200) {
+                console.log('Looks like there was a problem. Status Code: ' +
+                    response.status);
+                return;
+            } else return res.text();
+        })
+        .then(callback)
+
+};
+
+
 
 window.onload = setGrid(4, 12.5);
 
@@ -137,7 +171,8 @@ function showArea() {
     })
     uploadButton.removeEventListener('click', showArea);
     uploadButton.addEventListener('click', removeArea);
-    setDragDrop();
+    let url = '/photos/upload';
+    setDragDrop(areas, url);
 }
 
 function removeArea() {
@@ -147,9 +182,9 @@ function removeArea() {
     uploadButton.addEventListener('click', showArea);
 }
 
-function setDragDrop(params) {
-
-    areas.forEach((elemArea) => {
+function setDragDrop(elems, url, callback) {
+    callback = callback || null;
+    elems.forEach((elemArea) => {
         ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
             elemArea.addEventListener(eventName, preventDefaults, false)
         })
@@ -175,36 +210,21 @@ function setDragDrop(params) {
             elemArea.classList.remove('upload-area_highlight')
         };
 
-        elemArea.addEventListener('drop', handleDrop, false)
+        elemArea.addEventListener('drop', handleDrop, false);
 
-        function handleDrop(e) {
-            let dt = e.dataTransfer
-            let files = dt.files
-            handleFiles(files)
-        };
-
-        function handleFiles(files) {
-            ([...files]).forEach(uploadFile)
-        };
-
-        function uploadFile(file) {
-            let url = '/photos/upload'
-            let formData = new FormData()
-            formData.append('file', file)
-            fetch(url, {
-                    method: 'POST',
-                    body: formData
-                })
-                .then((res) => {
-                    if (res.status !== 200) {
-                        console.log('Looks like there was a problem. Status Code: ' +
-                            response.status);
-                        return;
-                    } else console.log('success');
-
-                })
-        };
     })
+
+    function handleDrop(e) {
+        let dt = e.dataTransfer
+        let files = dt.files
+        handleFiles(files)
+    };
+
+    function handleFiles(files) {
+        ([...files]).forEach(file => uploadFile(file, url, callback));
+    };
+
+
 }
 
 //NEW ALBUM CREATE
@@ -247,20 +267,296 @@ function sendAlbum(e) {
 logout.addEventListener('click', out);
 
 function out() {
-    const url = 'user/logout';
-    const init = {
-        method: 'GET'
-    };
-
-    fetch(url, init)
+    fetch('user/logout', { method: 'GET' })
         .then((res) => {
             if (res.status !== 200) {
-                console.log(`Looks like a problem. Status Code: ${res.status}`);
+                console.warn(`Looks like a problem. Status Code: ${res.status}`);
                 return;
             } else {
-                console.log(res)
-                window.location.href = res.url;
+                window.location.href = res.url
             }
         });
-
 }
+
+
+// Redactor 
+const getRedactor = document.querySelector('.profile__avatar-button');
+
+getRedactor.addEventListener('click', fetchRedactor);
+
+
+function fetchRedactor() {
+    fetchGet('redactor', avatarRedactor)
+
+
+    function avatarRedactor(box) {
+        let boxShadow = document.createElement('div');
+        boxShadow.className = 'box-wrapper'
+        boxShadow.innerHTML = box;
+        document.body.prepend(boxShadow);
+
+        const avatarArea = document.querySelector('.photo-redactor__img');
+        const avatarFade = document.querySelector('.photo-redactor__img_fade');
+        const avatarThumb = document.querySelector('.photo-redactor__cropper');
+        const avatarCircle = document.querySelector('.photo-redactor__cropper_circle')
+        const redactor = document.querySelector('.photo-redactor');
+        const image = document.querySelector('.photo-redactor__img');
+        const ltThumb = document.querySelector('.photo-redactor__thumb_LT');
+        const rtThumb = document.querySelector('.photo-redactor__thumb_RT');
+        const lbThumb = document.querySelector('.photo-redactor__thumb_LB');
+        const rbThumb = document.querySelector('.photo-redactor__thumb_RB');
+        let originSize = 100;
+        let shiftOffsetX = 0;
+        let cropOffsetX = 0;
+
+
+        avatarArea.onload = (e) => {
+            originSize = e.target.naturalWidth;
+            console.log(originSize)
+        }
+
+
+        // Picture shift
+        avatarFade.onmousedown = function(e) {
+
+            let offsetX = avatarFade.offsetLeft;
+            let cursor = e.clientX - offsetX;
+            moveAt(e);
+
+            document.onmousemove = function(e) {
+                moveAt(e);
+            }
+
+            function moveAt(e) {
+
+                let x = e.clientX - cursor;
+                let offset = Math.max(Math.min(x, 0), redactor.clientWidth - image.clientWidth);
+                avatarFade.style.left = offset + 'px';
+
+                shiftOffsetX = offset;
+
+                thumbShifter(shiftOffsetX, cropOffsetX);
+
+                document.onmouseup = function() {
+                    document.onmousemove = null;
+                }
+            }
+        }
+
+        //Thumb shift
+        avatarThumb.onmousedown = function(e) {
+
+            const startX = avatarThumb.offsetLeft;
+            const startY = avatarThumb.offsetTop;
+            const avatarStartX = avatarArea.offsetLeft;
+            const avatarStartY = avatarArea.offsetTop;
+            const leftBoard = redactor.getBoundingClientRect().left;
+            const rightBoard = redactor.clientWidth;
+            const topBoard = redactor.getBoundingClientRect().top;
+            const bottomBoard = redactor.clientHeight;
+            const thumbWidth = avatarThumb.clientWidth;
+
+            if (e.target !== avatarArea) {
+                resizer()
+                return;
+            };
+
+            // Thumb resize
+            function resizer() {
+
+                if (e.target == ltThumb) {
+                    let cursorX = e.clientX;
+                    let cursorY = e.clientY;
+                    document.onmousemove = function(e) {
+                        lt(e, cursorX, cursorY, (s) => {
+                            avatarThumb.style.left = startX - s + 'px';
+                            avatarThumb.style.top = startY - s + 'px';
+                            avatarArea.style.left = avatarStartX + s + 'px';
+                            avatarArea.style.top = avatarStartY + s + 'px';
+                        });
+                    }
+                }
+
+                if (e.target == rtThumb) {
+                    let cursorX = e.clientX;
+                    let cursorY = e.clientY;
+                    document.onmousemove = function(e) {
+                        rt(e, cursorX, cursorY, (s) => {
+                            avatarThumb.style.top = startY - s + 'px';
+                            avatarArea.style.top = avatarStartY + s + 'px';
+                        });
+                    }
+                }
+
+                if (e.target == lbThumb) {
+                    let cursorX = e.clientX;
+                    let cursorY = e.clientY;
+                    document.onmousemove = function(e) {
+                        lb(e, cursorX, cursorY, (s) => {
+                            avatarThumb.style.left = startX - s + 'px';
+                            avatarArea.style.left = avatarStartX + s + 'px';
+                        });
+                    }
+                }
+
+                if (e.target == rbThumb) {
+                    let cursorX = e.clientX;
+                    let cursorY = e.clientY;
+                    document.onmousemove = function(e) {
+                        rb(e, cursorX, cursorY, () => {});
+                    }
+                }
+
+                function lt(e, sX, sY, standAt) {
+                    let x = sX - e.clientX;
+                    let y = sY - e.clientY;
+                    let s = Math.max(x, y);
+                    standAt(s);
+                    sizeAt(s);
+                }
+
+                function rt(e, sX, sY, standAt) {
+                    let x = e.clientX - sX;
+                    let y = sY - e.clientY;
+                    let s = Math.max(x, y);
+                    standAt(s);
+                    sizeAt(s);
+                }
+
+                function lb(e, sX, sY, standAt) {
+                    let x = sX - e.clientX;
+                    let y = e.clientY - sY;
+                    let s = Math.max(x, y);
+                    standAt(s);
+                    sizeAt(s);
+                }
+
+                function rb(e, sX, sY, standAt) {
+                    let x = e.clientX - sX;
+                    let y = e.clientY - sY;
+                    let s = Math.max(x, y);
+                    standAt(s);
+                    sizeAt(s);
+                }
+
+                function sizeAt(s) {
+
+                    avatarThumb.style.width = thumbWidth + s + 'px';
+                    avatarThumb.style.height = thumbWidth + s + 'px';
+                    avatarCircle.style.width = thumbWidth + s + 'px';
+                    avatarCircle.style.height = thumbWidth + s + 'px';
+                    avatarArea.style.cursor = 'se-resize';
+                    avatarFade.style.cursor = 'se-resize';
+
+                    document.onmouseup = function() {
+                        if (e.target == ltThumb || e.target == lbThumb) cropOffsetX += s;
+                        avatarArea.style.cursor = 'move';
+                        avatarFade.style.cursor = 'grab';
+                        document.onmousemove = null;
+                    }
+                }
+            }
+
+            const offsetX = avatarThumb.getBoundingClientRect().left;
+            const offsetY = avatarThumb.getBoundingClientRect().top;
+            let cursorX = e.clientX;
+            let cursorY = e.clientY;
+            let cursorOffX = cursorX - offsetX;
+            let cursorOffY = cursorY - offsetY;
+
+            document.onmousemove = function(e) {
+                moveAt(e);
+
+            }
+
+            function moveAt(e) {
+
+                let cursorX = e.clientX;
+                let cursorY = e.clientY;
+
+                let x = cursorX - leftBoard - cursorOffX;
+                x = Math.max(Math.min(x, rightBoard - thumbWidth), 0);
+                avatarThumb.style.left = x + 'px';
+
+                let y = cursorY - topBoard - cursorOffY;
+                y = Math.max(Math.min(y, bottomBoard - thumbWidth), 0);
+                avatarThumb.style.top = y + 'px';
+
+
+                cropOffsetX = -x;
+                thumbShifter(shiftOffsetX, cropOffsetX);
+
+                avatarArea.style.top = -y + 'px';
+                document.onmouseup = function() {
+                    document.onmousemove = null;
+                }
+            }
+        }
+
+        function thumbShifter(a, b) {
+            avatarArea.style.left = a + b + 'px';
+        }
+
+        function getCoords() {
+            let coords = {};
+            let scale = originSize / avatarArea.clientWidth;
+            console.log(scale)
+            coords.width = avatarThumb.clientWidth * scale;
+            coords.left = (avatarThumb.offsetLeft - avatarFade.offsetLeft) * scale;
+            coords.top = (avatarThumb.offsetTop - avatarFade.offsetTop) * scale;
+            return coords;
+        }
+
+        // Avatar uploader 
+        const avatarInput = document.querySelector('.inputfile[type=file]');
+        const avatarDropArea = document.querySelectorAll('.avatar-drop-area');
+        const path = '/redactor/upload';
+
+        setDragDrop(avatarDropArea, path, (res) => {
+            deleteRedactor();
+            avatarRedactor(res);
+        });
+
+        avatarInput.oninput = (e) => {
+            let file = e.srcElement.files[0];
+            uploadFile(file, path, (res) => {
+                deleteRedactor();
+                avatarRedactor(res);
+            })
+        };
+
+        //Avatar saver
+        const seveAvatar = document.querySelector('.inputfile[type=submit]');
+        seveAvatar.onclick = () => {
+            let coords = getCoords();
+            fetch('/redactor/save', {
+                    method: 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(coords)
+                })
+                .then(res => {
+                    console.log(res.status);
+
+                    if (res.status == 201) {
+                        const ava = document.querySelector('.profile__avatar');
+                        const r = (Math.random() * 1E10).toString(32);
+                        ava.src = `/redactor/avatar/${r}`;
+                        deleteRedactor();
+
+                    }
+                })
+
+        };
+    }
+};
+// Redactor ereaser
+function deleteRedactor() {
+    let boxShadow = document.querySelector('.box-wrapper');
+    boxShadow.remove();
+    boxShadow = null;
+}
+
+document.ondragstart = () => false;

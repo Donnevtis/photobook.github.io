@@ -2,14 +2,23 @@ extends layout
 
 block content  
   body
-    button.sidebar-button(type='button')
-      .sidebar-button__line
+  button.sidebar-button(type='button')    
+    .sidebar-button__line
+  .box-display
     .sidebar
       .top
-        img.profile__avatar(src='photo/2019-01-31_21-18-40.png', alt='avatar')
-        .profile__name Amelia Rice
+        .profile__avatar-wrap
+          if user
+            img.profile__avatar(src=`/redactor/avatar/`, alt='avatar')
+          else
+            img.profile__avatar(src='/photo/pic/40.jpg', alt='avatar')
+          button.profile__avatar-button   
+            | Edit photo
+            br
+            | ▼
+        .profile__name #{fullname}               
         .profile__count 2390 files
-        button.upload-button(type='button') upload
+        button.upload-button(type='button') upload          
       .search
         img.search__forma(src='svg/Search.svg', alt='svg')
         input.search__input(type='text', placeholder='Search files')
@@ -46,6 +55,225 @@ block content
     .content
         .actions
           img.slideshow-button(src='svg/slideshowButton.svg')
-          img.share-button(src='svg/shareButton.svg')
-        if user  
+          img.share-button(src='svg/shareButton.svg')        
           img.logout-button(src='svg/logout.svg')
+        .album
+          .album__title
+            | Subcarpathia 2016
+            span.album__count (8 photos)
+          .album__grid
+            .album-cell
+              img.album-cell__img(src='photo/shvejtsariya.jpg', width='100%', height='100%')
+              .album-cell__meta
+                .album-cell__time 5:40 PM
+                .album-cell__f f/8
+                .album-cell__shotter 1/250
+                .album-cell__iso ISO 400
+              .album-cell__date 25.02.2016
+            .album-cell
+              img.album-cell__img(src='photo/gory_leto.jpg', width='100%', height='100%')
+              .album-cell__meta
+                .album-cell__time 5:40 PM
+                .album-cell__f f/8
+                .album-cell__shotter 1/250
+                .album-cell__iso ISO 400
+              .album-cell__date 25.02.2016
+            .album-cell
+              img.album-cell__img(src='photo/pirs_prichal.jpg', width='100%', height='100%')
+              .album-cell__meta
+                .album-cell__time 5:40 PM
+                .album-cell__f f/8
+                .album-cell__shotter 1/250
+                .album-cell__iso ISO 400
+              .album-cell__date 25.02.2016
+            .album-cell
+              .album-cell__meta
+                .album-cell__time 5:40 PM
+                .album-cell__f f/8
+                .album-cell__shotter 1/250
+                .album-cell__iso ISO 400
+              .album-cell__date
+            .album-cell
+              .album-cell__meta
+                .album-cell__time 5:40 PM
+                .album-cell__f f/8
+                .album-cell__shotter 1/250
+                .album-cell__iso ISO 400
+              .album-cell__date
+            .album-cell
+              .album-cell__meta
+                .album-cell__time 5:40 PM
+                .album-cell__f f/8
+                .album-cell__shotter 1/250
+                .album-cell__iso ISO 400
+              .album-cell__date
+            .album-cell
+              .album-cell__meta
+                .album-cell__time 5:40 PM
+                .album-cell__f f/8
+                .album-cell__shotter 1/250
+                .album-cell__iso ISO 400
+              .album-cell__date
+            .album-cell
+              .album-cell__meta
+                .album-cell__time 5:40 PM
+                .album-cell__f f/8
+                .album-cell__shotter 1/250
+                .album-cell__iso ISO 400
+              .album-cell__date
+            .album-cell
+              img.album-cell__img(src='photo/shvejtsariya.jpg', width='100%', height='100%')
+              .album-cell__meta
+                .album-cell__time 5:40 PM
+                .album-cell__f f/8
+                .album-cell__shotter 1/250
+                .album-cell__iso ISO 400
+              .album-cell__date 25.02.2016
+            .album-cell
+              img.album-cell__img(src='photo/gory_leto.jpg', width='100%', height='100%')
+              .album-cell__meta
+                .album-cell__time 5:40 PM
+                .album-cell__f f/8
+                .album-cell__shotter 1/250
+                .album-cell__iso ISO 400
+              .album-cell__date 25.01.2016
+            .album-cell
+              img.album-cell__img(src='photo/pirs_prichal.jpg', width='100%', height='100%')
+              .album-cell__meta
+                .album-cell__time 5:40 PM
+                .album-cell__f f/8
+                .album-cell__shotter 1/250
+                .album-cell__iso ISO 400
+              .album-cell__date 25.02.2016
+            .album-cell
+              .album-cell__meta
+                .album-cell__time 5:40 PM
+                .album-cell__f f/8
+                .album-cell__shotter 1/250
+                .album-cell__iso ISO 400
+              .album-cell__date 25.02.2016
+            .album-cell
+              .album-cell__meta
+                .album-cell__time 5:40 PM
+                .album-cell__f f/8
+                .album-cell__shotter 1/250
+                .album-cell__iso ISO 400
+              .album-cell__date
+            .album-cell
+              .album-cell__meta
+                .album-cell__time 5:40 PM
+                .album-cell__f f/8
+                .album-cell__shotter 1/250
+                .album-cell__iso ISO 400
+              .album-cell__date
+            .album-cell
+              .album-cell__meta
+                .album-cell__time 5:40 PM
+                .album-cell__f f/8
+                .album-cell__shotter 1/250
+                .album-cell__iso ISO 400
+              .album-cell__date
+            .album-cell
+              .album-cell__meta
+                .album-cell__time 5:40 PM
+                .album-cell__f f/8
+                .album-cell__shotter 1/250
+                .album-cell__iso ISO 400
+              .album-cell__date
+            .album-cell
+              .album-cell__meta
+                .album-cell__time 5:40 PM
+                .album-cell__f f/8
+                .album-cell__shotter 1/250
+                .album-cell__iso ISO 400
+              .album-cell__date
+            .album-cell
+              .album-cell__meta
+                .album-cell__time 5:40 PM
+                .album-cell__f f/8
+                .album-cell__shotter 1/250
+                .album-cell__iso ISO 400
+              .album-cell__date
+            .album-cell
+              .album-cell__meta
+                .album-cell__time 5:40 PM
+                .album-cell__f f/8
+                .album-cell__shotter 1/250
+                .album-cell__iso ISO 400
+              .album-cell__date
+            .album-cell
+              .album-cell__meta
+                .album-cell__time 5:40 PM
+                .album-cell__f f/8
+                .album-cell__shotter 1/250
+                .album-cell__iso ISO 400
+              .album-cell__date
+            .album-cell
+              .album-cell__meta
+                .album-cell__time 5:40 PM
+                .album-cell__f f/8
+                .album-cell__shotter 1/250
+                .album-cell__iso ISO 400
+              .album-cell__date
+        .album
+          .album__title
+            | Summer 2015
+            span.album__count (16 photos)
+          .album__grid
+            .album-cell
+              img.album-cell__img(src='photo/shvejtsariya.jpg', width='100%', height='100%')
+              .album-cell__meta
+                .album-cell__time 5:40 PM
+                .album-cell__f f/8
+                .album-cell__shotter 1/250
+                .album-cell__iso ISO 400
+              .album-cell__date 25.02.2016
+            .album-cell
+              .album-cell__meta
+                .album-cell__time 5:40 PM
+                .album-cell__f f/8
+                .album-cell__shotter 1/250
+                .album-cell__iso ISO 400
+              .album-cell__date
+            .album-cell
+              .album-cell__meta
+                .album-cell__time 5:40 PM
+                .album-cell__f f/8
+                .album-cell__shotter 1/250
+                .album-cell__iso ISO 400
+              .album-cell__date
+            .album-cell
+              .album-cell__meta
+                .album-cell__time 5:40 PM
+                .album-cell__f f/8
+                .album-cell__shotter 1/250
+                .album-cell__iso ISO 400
+              .album-cell__date
+            .album-cell
+              .album-cell__meta
+                .album-cell__time 5:40 PM
+                .album-cell__f f/8
+                .album-cell__shotter 1/250
+                .album-cell__iso ISO 400
+              .album-cell__date
+            .album-cell
+              .album-cell__meta
+                .album-cell__time 5:40 PM
+                .album-cell__f f/8
+                .album-cell__shotter 1/250
+                .album-cell__iso ISO 400
+              .album-cell__date
+            .album-cell
+              .album-cell__meta
+                .album-cell__time 5:40 PM
+                .album-cell__f f/8
+                .album-cell__shotter 1/250
+                .album-cell__iso ISO 400
+              .album-cell__date
+            .album-cell
+              .album-cell__meta
+                .album-cell__time 5:40 PM
+                .album-cell__f f/8
+                .album-cell__shotter 1/250
+                .album-cell__iso ISO 400
+              .album-cell__date

@@ -1,14 +1,28 @@
-extends layout
-
-block content          
+html(lang='en')
+  head
+    meta(charset='UTF-8')
+    meta(name='viewport', content='width=device-width, initial-scale=1.0, viewport-fit=cover')
+    meta(http-equiv='X-UA-Compatible', content='ie=edge')
+    title Photobook    
+    link(rel='stylesheet', href='/stylereg.css')
+    script(src='/rg_vds2.js', async='')
+    link(rel='apple-touch-icon', sizes='180x180', href='/favicon/apple-touch-icon.png')
+    link(rel='icon', type='image/png', sizes='32x32', href='/favicon/favicon-32x32.png')
+    link(rel='icon', type='image/png', sizes='16x16', href='/favicon/favicon-16x16.png')
+    link(rel='manifest', href='/favicon/site.webmanifest')
+    link(rel='mask-icon', href='/favicon/safari-pinned-tab.svg', color='#5bbad5')
+    meta(name='msapplication-TileColor', content='#da532c')
+    meta(name='theme-color', content='#ffffff')
+  body  
       .sidebar
+        != messages('messages', locals)        
         form.form-signup(method='POST' action='/user/login')
-          .form-signup__title Sign in
-          div(class=`form-signup__input-title ${name}`) Username
-          input.form-signup__input(type='text', name='username', placeholder='Username...')        
-          div(class=`form-signup__input-title ${password}`) Password
-          input.form-signup__input(type='password', name='password')          
+          .form-signup__title Sign in         
+          input.form-signup__input(type='text', name='username', placeholder='Username...')           
+          input.form-signup__input(type='password', name='password', placeholder='Password...')          
           .buttons
-            input.signup(type='submit', value='Sign in')
-            button.signin Sign up →
+            input.signup(type='submit', value='Sign in')            
+            a.signin(href="/user") Sign up →
       .background
+      
+
