@@ -1,13 +1,13 @@
-const slider = document.querySelector('.scale__slider');
-const fillLine = document.querySelector('.scale_slider-fill');
-const photoGrid = document.querySelectorAll('.album__grid');
-const sidebarButton = document.querySelector('.sidebar-button');
-const sidebar = document.querySelector('.sidebar');
-const content = document.querySelector('.content');
-const uploadButton = document.querySelector('.upload-button');
-const menuButton = document.querySelector('.menu__button');
-const newAlButton = document.querySelector('.menu__new-album');
-const logout = document.querySelector('.logout-button');
+const slider = document.querySelector('.scale__slider'),
+    fillLine = document.querySelector('.scale_slider-fill'),
+    photoGrid = document.querySelectorAll('.album__grid'),
+    sidebarButton = document.querySelector('.sidebar-button'),
+    sidebar = document.querySelector('.sidebar'),
+    content = document.querySelector('.content'),
+    uploadButton = document.querySelector('.upload-button'),
+    menuButton = document.querySelector('.menu__button'),
+    newAlButton = document.querySelector('.menu__new-album'),
+    logout = document.querySelector('.logout-button');
 let areas = [];
 
 // Fetch methods
@@ -21,28 +21,35 @@ function fetchGet(url, callback) {
                 return res.text();
             }
         })
-        .then(callback);
+        .then(callback)
+
 
 }
 
-function uploadFile(file, url, callback) {
+function uploadFile(files, url, callback, title) {
     let formData = new FormData()
-    formData.append('file', file)
+    let arr = [];
+    formData.append('title', title);
+    ([...files]).forEach(file => arr.push(file));
+    arr.forEach(file => formData.append('file', file));
     fetch(url, {
             method: 'POST',
             body: formData
         })
         .then((res) => {
+
             if (res.status !== 200) {
-                console.log('Looks like there was a problem. Status Code: ' +
-                    response.status);
-                return;
+                console.log('Looks like there was a problem. Status Code: ' + res.status);
             } else return res.text();
+            if (res.status === 300) {
+                alert('too many files');
+                console.log(res);
+
+            };
         })
         .then(callback)
 
 };
-
 
 
 window.onload = setGrid(4, 12.5);
@@ -102,7 +109,11 @@ function setGrid(col, vw) {
                 for (let i = col * 2; i < cells.length; i++) {
                     cells[i].style.display = 'none';
                 }
+            } else {
+                r = (cells.length / col || 1);
+                r = Math.ceil(r);
             }
+
         } else if (col == 5 || col == 6) {
             r = 3;
             if (cells.length > col * 3) {
@@ -145,135 +156,173 @@ function closeSidebar() {
 }
 
 //upload files show area
-
 uploadButton.addEventListener('click', showArea);
 
 function showArea() {
-
-    photoGrid.forEach((elem) => {
-
-        let upArea = document.createElement('div');
-        upArea.classList.add('upload-area');
-        upArea.style.top = elem.offsetTop + 'px';
-        upArea.style.left = elem.offsetLeft + 'px';
-        upArea.style.width = elem.offsetWidth + 'px';
-        upArea.style.height = elem.offsetHeight + 'px';
-        upArea.innerHTML = 'DRAG FILE HERE';
-        content.append(upArea);
-        areas.push(upArea);
-        let areaInput = document.createElement('input');
-        areaInput.setAttribute('placeholder', 'DRAG FILE HERE');
-        areaInput.setAttribute('type', 'file');
-        areaInput.className = 'upload-area__input';
-        areaInput.setAttribute('accept', 'image/*');
-        areaInput.multiple = 'true';
-        upArea.append(areaInput);
-    })
+    photoGrid.forEach((elem) => { addUploadAreas(elem) });
     uploadButton.removeEventListener('click', showArea);
     uploadButton.addEventListener('click', removeArea);
-    let url = '/photos/upload';
-    setDragDrop(areas, url);
 }
+
+function addUploadAreas(elem) {
+    let upArea = document.createElement('div');
+    upArea.classList.add('upload-area');
+    upArea.innerHTML = 'DRAG FILES HERE';
+    elem.prepend(upArea);
+    areas.push(upArea);
+    let areaInput = document.createElement('input');
+
+    areaInput.setAttribute('type', 'file');
+    areaInput.className = 'upload-area__input';
+    areaInput.setAttribute('accept', '.jpg, .jpeg, .png');
+    areaInput.multiple = true;
+    upArea.append(areaInput);
+    let url = 'upload/';
+    let title = elem.previousSibling.firstChild.data;
+
+    const callback = (res) => {
+        removeArea();
+        const container = document.createElement('div');
+        container.innerHTML += res;
+        let cells = container.children;
+        const length = cells.length;
+        for (let i = 0; i < length; i++) {
+            elem.prepend(cells[0]);
+        }
+        const counterAll = document.querySelector('.profile__count');
+        const counter = elem.previousSibling.lastChild;
+        let count = counter.innerHTML.replace(/\D/g, '');
+        let countAll = counterAll.innerHTML.replace(/\D/g, '');
+        counter.innerHTML = `(${length + +count} photos)`;
+        counterAll.innerHTML = `${length + +countAll} photos`;
+
+        let input = new Event('input');
+        slider.dispatchEvent(input);
+    }
+    setDragDrop(upArea, url, callback, title);
+}
+
+function setDragDrop(elem, url, callback, title) {
+    callback = callback || null;
+    title = title || null;
+
+    ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+        elem.addEventListener(eventName, preventDefaults, false)
+    });
+
+    function preventDefaults(e) {
+        e.preventDefault()
+        e.stopPropagation()
+    };
+
+    ['dragenter', 'dragover'].forEach(eventName => {
+        elem.addEventListener(eventName, highlight, false)
+    });
+    ['dragleave', 'drop'].forEach(eventName => {
+        elem.addEventListener(eventName, unhighlight, false)
+    });
+
+    function highlight(e) {
+        elem.classList.add('upload-area_highlight')
+    };
+
+    function unhighlight(e) {
+        elem.classList.remove('upload-area_highlight')
+    };
+
+    elem.addEventListener('drop', handleDrop, false);
+
+    function handleDrop(e) {
+        elem.innerHTML = '<div class="lds-grid"><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>'
+        let dt = e.dataTransfer;
+        let files = dt.files;
+        uploadFile(files, url, callback, title);
+    };
+}
+
 
 function removeArea() {
     areas.forEach((elem) => {
         elem.remove();
     })
+    areas = [];
     uploadButton.addEventListener('click', showArea);
-}
-
-function setDragDrop(elems, url, callback) {
-    callback = callback || null;
-    elems.forEach((elemArea) => {
-        ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
-            elemArea.addEventListener(eventName, preventDefaults, false)
-        })
-
-
-        function preventDefaults(e) {
-            e.preventDefault()
-            e.stopPropagation()
-        };
-
-        ['dragenter', 'dragover'].forEach(eventName => {
-            elemArea.addEventListener(eventName, highlight, false)
-        });
-        ['dragleave', 'drop'].forEach(eventName => {
-            elemArea.addEventListener(eventName, unhighlight, false)
-        });
-
-        function highlight(e) {
-            elemArea.classList.add('upload-area_highlight')
-        };
-
-        function unhighlight(e) {
-            elemArea.classList.remove('upload-area_highlight')
-        };
-
-        elemArea.addEventListener('drop', handleDrop, false);
-
-    })
-
-    function handleDrop(e) {
-        let dt = e.dataTransfer
-        let files = dt.files
-        handleFiles(files)
-    };
-
-    function handleFiles(files) {
-        ([...files]).forEach(file => uploadFile(file, url, callback));
-    };
-
-
 }
 
 //NEW ALBUM CREATE
 
-menuButton.addEventListener('click', addAlbum);
+menuButton.addEventListener('click', showInput);
 
-function addAlbum() {
+
+function showInput() {
+    menuButton.removeEventListener('click', showInput);
+    menuButton.addEventListener('click', hideInput);
+    newAlButton.addEventListener('keydown', sendAlbum)
     const event = new Event('focus');
     newAlButton.style.display = 'block';
     newAlButton.focus();
-    newAlButton.onblur = () => newAlButton.style.display = 'none';
-    newAlButton.addEventListener('keydown', sendAlbum)
+
 }
 
+function hideInput() {
+
+    newAlButton.style.display = 'none';
+    menuButton.removeEventListener('click', hideInput);
+    menuButton.addEventListener('click', showInput);
+};
+
+
 function sendAlbum(e) {
+    const title = e.target.value
     if (e.key !== 'Enter') return;
-
+    hideInput();
     const url = '/create';
-
     const init = {
         method: 'POST',
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ title: e.target.value })
+        body: JSON.stringify({ title: title })
     };
 
     fetch(url, init)
         .then((res) => {
             if (res.status !== 200) {
-                console.log(`Looks like a problem. Status Code: ${res.status}`);
+                console.warn(`Looks like a problem. Status Code: ${res.status}`);
                 return;
-            } else { console.log(res.body) }
+            } else showAlbum(title);
         });
-
     e.target.value = '';
-    e.target.style.display = 'none';
     e.target.removeEventListener('keydown', sendAlbum);
 }
 
-// LOGOUT BUTTON
-logout.addEventListener('click', out);
+function showAlbum(title) {
+    let album = document.querySelector('.album');
+    const actions = document.querySelector('.actions')
+    album = album.cloneNode(true);
+    const albumGrid = album.lastChild;
+    album.firstChild.firstChild.data = title;
+    album.firstChild.lastChild.innerHTML = '(0 photos)';
+    albumGrid.innerHTML = '';
+    actions.after(album);
+    addUploadAreas(albumGrid);
+    // Menu item
+    let menuItem = document.querySelectorAll('label.menu__option');
+    menuItem = menuItem[menuItem.length - 1].cloneNode(true);
+    menuItem.firstChild.data = title;
+    newAlButton.after(menuItem);
+}
 
-function out() {
+
+// LOGOUT BUTTON
+logout.addEventListener('click', leave);
+
+function leave() {
     fetch('user/logout', { method: 'GET' })
         .then((res) => {
             if (res.status !== 200) {
                 console.warn(`Looks like a problem. Status Code: ${res.status}`);
                 return;
             } else {
-                window.location.href = res.url
+                window.location.href = res.url;
             }
         });
 }
@@ -282,10 +331,10 @@ function out() {
 // Redactor 
 const getRedactor = document.querySelector('.profile__avatar-button');
 
-getRedactor.addEventListener('click', fetchRedactor);
+getRedactor.addEventListener('click', Redactor);
 
 
-function fetchRedactor() {
+function Redactor() {
     fetchGet('redactor', avatarRedactor)
 
 
@@ -294,33 +343,73 @@ function fetchRedactor() {
         boxShadow.className = 'box-wrapper'
         boxShadow.innerHTML = box;
         document.body.prepend(boxShadow);
-
+        boxShadow.addEventListener('mousedown', deleteRedactor);
+        boxShadow.addEventListener('wheel', (e) => e.preventDefault(), false);
         const avatarArea = document.querySelector('.photo-redactor__img');
         const avatarFade = document.querySelector('.photo-redactor__img_fade');
         const avatarThumb = document.querySelector('.photo-redactor__cropper');
         const avatarCircle = document.querySelector('.photo-redactor__cropper_circle')
         const redactor = document.querySelector('.photo-redactor');
-        const image = document.querySelector('.photo-redactor__img');
         const ltThumb = document.querySelector('.photo-redactor__thumb_LT');
         const rtThumb = document.querySelector('.photo-redactor__thumb_RT');
         const lbThumb = document.querySelector('.photo-redactor__thumb_LB');
         const rbThumb = document.querySelector('.photo-redactor__thumb_RB');
-        let originSize = 100;
+        let originWidth = 100;
+        let originHeight = 100;
         let shiftOffsetX = 0;
+        let shiftOffsetY = 0;
         let cropOffsetX = 0;
+        let cropOffsetY = 0;
+        let width = redactor.offsetWidth;
+        let height = redactor.offsetHeight;
 
 
         avatarArea.onload = (e) => {
-            originSize = e.target.naturalWidth;
-            console.log(originSize)
-        }
+            originWidth = e.target.naturalWidth;
+            originHeight = e.target.naturalHeight;
 
+            if (originWidth > originHeight) {
+                avatarFade.style.height = '100%';
+                avatarFade.style.width = 'auto';
+                avatarArea.style.height = height + 'px';
+                avatarArea.style.width = 'auto';
+                avatarFade.addEventListener('mousedown', shiftSE);
+            } else {
+                avatarFade.style.width = '100%';
+                avatarFade.style.height = 'auto';
+                avatarArea.style.width = width + 'px';
+                avatarArea.style.height = 'auto';
+                avatarFade.addEventListener('mousedown', shiftNW);
+
+            }
+        };
 
         // Picture shift
-        avatarFade.onmousedown = function(e) {
+        function shiftSE(e) {
 
             let offsetX = avatarFade.offsetLeft;
-            let cursor = e.clientX - offsetX;
+            let cursorX = e.clientX - offsetX;
+            moveAt(e);
+            document.onmousemove = function(e) {
+                moveAt(e);
+            };
+
+            function moveAt(e) {
+                let x = e.clientX - cursorX;
+                let shiftX = Math.max(Math.min(x, 0), redactor.clientWidth - avatarFade.clientWidth);
+                avatarFade.style.left = shiftX + 'px';
+                shiftOffsetX = shiftX;
+                thumbShifterSE(shiftOffsetX, cropOffsetX);
+                document.onmouseup = function() {
+                    document.onmousemove = null;
+                }
+            }
+        };
+
+        function shiftNW(e) {
+            let offsetY = avatarFade.offsetTop;
+            let cursorY = e.clientY - offsetY;
+
             moveAt(e);
 
             document.onmousemove = function(e) {
@@ -328,32 +417,22 @@ function fetchRedactor() {
             }
 
             function moveAt(e) {
-
-                let x = e.clientX - cursor;
-                let offset = Math.max(Math.min(x, 0), redactor.clientWidth - image.clientWidth);
-                avatarFade.style.left = offset + 'px';
-
-                shiftOffsetX = offset;
-
-                thumbShifter(shiftOffsetX, cropOffsetX);
-
+                let y = e.clientY - cursorY;
+                let shiftY = Math.max(Math.min(y, 0), redactor.clientHeight - avatarFade.clientHeight);
+                avatarFade.style.top = shiftY + 'px';
+                shiftOffsetY = shiftY;
+                thumbShifterNW(shiftOffsetY, cropOffsetY);
                 document.onmouseup = function() {
                     document.onmousemove = null;
                 }
             }
-        }
+        };
 
         //Thumb shift
         avatarThumb.onmousedown = function(e) {
 
             const startX = avatarThumb.offsetLeft;
             const startY = avatarThumb.offsetTop;
-            const avatarStartX = avatarArea.offsetLeft;
-            const avatarStartY = avatarArea.offsetTop;
-            const leftBoard = redactor.getBoundingClientRect().left;
-            const rightBoard = redactor.clientWidth;
-            const topBoard = redactor.getBoundingClientRect().top;
-            const bottomBoard = redactor.clientHeight;
             const thumbWidth = avatarThumb.clientWidth;
 
             if (e.target !== avatarArea) {
@@ -361,102 +440,101 @@ function fetchRedactor() {
                 return;
             };
 
-            // Thumb resize
+            // Crop resize
             function resizer() {
-
+                let cursorX = e.clientX;
+                let cursorY = e.clientY;
+                let frame = redactor.offsetWidth;
+                let right = frame - startX - thumbWidth;
+                let bottom = frame - startY - thumbWidth;
+                let s = 0;
                 if (e.target == ltThumb) {
-                    let cursorX = e.clientX;
-                    let cursorY = e.clientY;
-                    document.onmousemove = function(e) {
-                        lt(e, cursorX, cursorY, (s) => {
-                            avatarThumb.style.left = startX - s + 'px';
-                            avatarThumb.style.top = startY - s + 'px';
-                            avatarArea.style.left = avatarStartX + s + 'px';
-                            avatarArea.style.top = avatarStartY + s + 'px';
-                        });
+                    document.onmousemove = (e) => {
+                        avatarFade.style.cursor = 'nw-resize';
+                        let x = cursorX - e.clientX;
+                        let y = cursorY - e.clientY;
+                        s = Math.max(x, y);
+                        let l = startX - s;
+                        let t = startY - s;
+                        let w = thumbWidth + s;
+                        let left = Math.min(Math.max(l, Math.max(startX - startY, 0)), frame - right - 80);
+                        let top = Math.min(Math.max(t, Math.max(startY - startX, 0)), frame - bottom - 80);
+                        let width = Math.min(frame - right, Math.max(w, 80));
+                        let height = Math.min(frame - bottom, Math.max(w, 80));
+                        resize(left, top, width, height);
                     }
                 }
 
                 if (e.target == rtThumb) {
-                    let cursorX = e.clientX;
-                    let cursorY = e.clientY;
-                    document.onmousemove = function(e) {
-                        rt(e, cursorX, cursorY, (s) => {
-                            avatarThumb.style.top = startY - s + 'px';
-                            avatarArea.style.top = avatarStartY + s + 'px';
-                        });
-                    }
-                }
-
-                if (e.target == lbThumb) {
-                    let cursorX = e.clientX;
-                    let cursorY = e.clientY;
-                    document.onmousemove = function(e) {
-                        lb(e, cursorX, cursorY, (s) => {
-                            avatarThumb.style.left = startX - s + 'px';
-                            avatarArea.style.left = avatarStartX + s + 'px';
-                        });
+                    document.onmousemove = (e) => {
+                        avatarFade.style.cursor = 'ne-resize';
+                        let x = e.clientX - cursorX;
+                        let y = cursorY - e.clientY;
+                        s = Math.max(x, y);
+                        let t = startY - s;
+                        let w = thumbWidth + s;
+                        let left = startX;
+                        let top = Math.min(Math.max(t, Math.max(startY - right, 0)), frame - bottom - 80);
+                        let width = Math.min(frame - left, Math.max(w, 80));
+                        let height = Math.min(frame - bottom, Math.max(w, 80));
+                        resize(left, top, width, height);
                     }
                 }
 
                 if (e.target == rbThumb) {
-                    let cursorX = e.clientX;
-                    let cursorY = e.clientY;
-                    document.onmousemove = function(e) {
-                        rb(e, cursorX, cursorY, () => {});
+                    document.onmousemove = (e) => {
+                        avatarFade.style.cursor = 'se-resize';
+                        let x = e.clientX - cursorX;
+                        let y = e.clientY - cursorY;
+                        s = Math.max(x, y);
+                        let left = startX;
+                        let top = startY;
+                        let w = thumbWidth + s;
+                        let width = Math.min(frame - left, Math.max(w, 80));
+                        let height = Math.min(frame - top, Math.max(w, 80));
+                        resize(left, top, width, height);
                     }
                 }
 
-                function lt(e, sX, sY, standAt) {
-                    let x = sX - e.clientX;
-                    let y = sY - e.clientY;
-                    let s = Math.max(x, y);
-                    standAt(s);
-                    sizeAt(s);
-                }
-
-                function rt(e, sX, sY, standAt) {
-                    let x = e.clientX - sX;
-                    let y = sY - e.clientY;
-                    let s = Math.max(x, y);
-                    standAt(s);
-                    sizeAt(s);
-                }
-
-                function lb(e, sX, sY, standAt) {
-                    let x = sX - e.clientX;
-                    let y = e.clientY - sY;
-                    let s = Math.max(x, y);
-                    standAt(s);
-                    sizeAt(s);
-                }
-
-                function rb(e, sX, sY, standAt) {
-                    let x = e.clientX - sX;
-                    let y = e.clientY - sY;
-                    let s = Math.max(x, y);
-                    standAt(s);
-                    sizeAt(s);
-                }
-
-                function sizeAt(s) {
-
-                    avatarThumb.style.width = thumbWidth + s + 'px';
-                    avatarThumb.style.height = thumbWidth + s + 'px';
-                    avatarCircle.style.width = thumbWidth + s + 'px';
-                    avatarCircle.style.height = thumbWidth + s + 'px';
-                    avatarArea.style.cursor = 'se-resize';
-                    avatarFade.style.cursor = 'se-resize';
-
-                    document.onmouseup = function() {
-                        if (e.target == ltThumb || e.target == lbThumb) cropOffsetX += s;
-                        avatarArea.style.cursor = 'move';
-                        avatarFade.style.cursor = 'grab';
-                        document.onmousemove = null;
+                if (e.target == lbThumb) {
+                    document.onmousemove = (e) => {
+                        avatarFade.style.cursor = 'sw-resize';
+                        let x = cursorX - e.clientX;
+                        let y = e.clientY - cursorY;
+                        s = Math.max(x, y);
+                        let l = startX - s;
+                        let top = startY;
+                        let w = thumbWidth + s;
+                        let left = Math.min(Math.max(l, Math.max(startX - bottom, 0)), frame - right - 80);
+                        let width = Math.min(frame - right, Math.max(w, 80));
+                        let height = Math.min(frame - top, Math.max(w, 80));
+                        resize(left, top, width, height);
                     }
+                }
+
+                function resize(left, top, width, height) {
+                    avatarThumb.style.left = left + 'px';
+                    avatarThumb.style.top = top + 'px';
+                    avatarArea.style.left = -left - -shiftOffsetX + 'px';
+                    avatarArea.style.top = -top - -shiftOffsetY + 'px';
+                    avatarThumb.style.width = Math.min(width, height) + 'px';
+                    avatarThumb.style.height = Math.min(width, height) + 'px';
+                    avatarCircle.style.width = Math.min(width, height) + 'px';
+                    avatarCircle.style.height = Math.min(width, height) + 'px';
+                }
+
+                document.onmouseup = function() {
+                    avatarFade.style.cursor = 'grab';
+                    if (e.target == ltThumb || e.target == lbThumb) cropOffsetX += s;
+                    if (e.target == ltThumb || e.target == rtThumb) cropOffsetY += s;
+                    document.onmousemove = null;
                 }
             }
 
+            const leftBoard = redactor.getBoundingClientRect().left;
+            const rightBoard = redactor.clientWidth;
+            const topBoard = redactor.getBoundingClientRect().top;
+            const bottomBoard = redactor.clientHeight;
             const offsetX = avatarThumb.getBoundingClientRect().left;
             const offsetY = avatarThumb.getBoundingClientRect().top;
             let cursorX = e.clientX;
@@ -484,23 +562,29 @@ function fetchRedactor() {
 
 
                 cropOffsetX = -x;
-                thumbShifter(shiftOffsetX, cropOffsetX);
+                thumbShifterSE(shiftOffsetX, cropOffsetX);
 
-                avatarArea.style.top = -y + 'px';
+                cropOffsetY = -y;
+                thumbShifterNW(shiftOffsetY, cropOffsetY);
+
                 document.onmouseup = function() {
                     document.onmousemove = null;
                 }
             }
+
         }
 
-        function thumbShifter(a, b) {
+        function thumbShifterSE(a, b) {
             avatarArea.style.left = a + b + 'px';
+        }
+
+        function thumbShifterNW(a, b) {
+            avatarArea.style.top = a + b + 'px';
         }
 
         function getCoords() {
             let coords = {};
-            let scale = originSize / avatarArea.clientWidth;
-            console.log(scale)
+            let scale = originWidth / avatarArea.clientWidth;
             coords.width = avatarThumb.clientWidth * scale;
             coords.left = (avatarThumb.offsetLeft - avatarFade.offsetLeft) * scale;
             coords.top = (avatarThumb.offsetTop - avatarFade.offsetTop) * scale;
@@ -509,19 +593,23 @@ function fetchRedactor() {
 
         // Avatar uploader 
         const avatarInput = document.querySelector('.inputfile[type=file]');
-        const avatarDropArea = document.querySelectorAll('.avatar-drop-area');
+        const avatarDropArea = document.querySelector('.avatar-drop-area');
         const path = '/redactor/upload';
 
         setDragDrop(avatarDropArea, path, (res) => {
+            if (!res) return;
             deleteRedactor();
             avatarRedactor(res);
+
         });
 
         avatarInput.oninput = (e) => {
-            let file = e.srcElement.files[0];
+            let file = e.srcElement.files;
             uploadFile(file, path, (res) => {
+                if (!res) return;
                 deleteRedactor();
                 avatarRedactor(res);
+
             })
         };
 
@@ -538,23 +626,22 @@ function fetchRedactor() {
                     body: JSON.stringify(coords)
                 })
                 .then(res => {
-                    console.log(res.status);
-
                     if (res.status == 201) {
                         const ava = document.querySelector('.profile__avatar');
                         const r = (Math.random() * 1E10).toString(32);
                         ava.src = `/redactor/avatar/${r}`;
                         deleteRedactor();
-
                     }
-                })
 
+                })
         };
     }
 };
+
 // Redactor ereaser
-function deleteRedactor() {
+function deleteRedactor(e) {
     let boxShadow = document.querySelector('.box-wrapper');
+    if (e && e.target !== boxShadow) return;
     boxShadow.remove();
     boxShadow = null;
 }

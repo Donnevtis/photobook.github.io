@@ -270,13 +270,17 @@
     }
     
     .menu__title {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
         font-size: 14px;
         font-family: 'Helvetica Neue';
         color: rgb(214, 213, 223);
         font-weight: bold;
         text-transform: uppercase;
         position: relative;
-        margin-left: 18px;
+        padding-left: 18px;
+        padding-right: 18px;
         z-index: 121;
         margin-bottom: 17px;
         letter-spacing: 0.05em;
@@ -288,13 +292,15 @@
         position: relative;
         width: 18px;
         height: 18px;
-        margin: 0 20px;
+        cursor: pointer;
+        z-index: 5;
         border-width: 2px;
         border-color: rgb(234, 90, 90);
         border-style: solid;
         border-radius: 50%;
-        cursor: pointer;
     }
+    
+    .menu__button_icon {}
     
     .menu__new-album {
         font-size: 14px;
@@ -468,6 +474,10 @@
     }
     /* content */
     
+    .content {
+        width: 100%;
+    }
+    
     .actions {
         position: absolute;
         right: 50px;
@@ -493,34 +503,16 @@
     
     .album {
         margin-bottom: 40px;
-    }
-    
-    .upload-area {
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        position: absolute;
-        background-color: #19181ebe;
-        z-index: 10;
-        border: 3px solid #19181e42;
-        border-radius: 5px;
-        font-size: 42px;
-        font-family: "Helvetica Neue";
-        color: rgb(231, 231, 231);
-        vertical-align: middle;
-        transition: border-color .2s ease;
+        position: relative;
+        z-index: 0;
     }
     
     .upload-area:hover {
-        border-color: rgb(231, 231, 231);
+        border: 3px dashed #ede9ffc7;
     }
     
     .upload-area__input {
         display: none;
-    }
-    
-    .upload-area_highlight {
-        border-color: #ede9ffc7;
     }
     
     .album__title {
@@ -550,7 +542,24 @@
         grid-template-columns: repeat(4, 1fr);
         grid-template-rows: repeat(2, 12.5vw);
         width: 100%;
-        /* background-color: #a3a2a867; */
+    }
+    
+    .upload-area {
+        height: 100%;
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        background-color: #19181ebe;
+        z-index: 10;
+        border: 3px dashed #19181e42;
+        border-radius: 5px;
+        font-size: 42px;
+        font-family: "Helvetica Neue";
+        color: #ede9ffc7;
+        transition: border .2s ease;
+        text-align: center;
     }
     
     .album-cell {
@@ -606,6 +615,7 @@
     
     .avatar-changer {
         display: flex;
+        justify-content: space-between;
         position: fixed;
         width: 70vw;
         height: 60vh;
@@ -616,12 +626,20 @@
         border-radius: 5px;
     }
     
+    .photo-redactor-wrap {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 100%;
+        width: 100%;
+    }
+    
     .photo-redactor {
         position: relative;
         left: 0;
         top: 0;
-        height: 60vh;
-        width: 60%;
+        width: 30vw;
+        height: 30vw;
         border-radius: 5px;
         overflow: hidden;
     }
@@ -636,14 +654,15 @@
         display: block;
         position: absolute;
         cursor: grab;
-        height: 60vh;
+        height: auto;
     }
     
     .photo-redactor__img_fade {
+        object-position: 0 0;
         display: block;
         position: absolute;
         cursor: grab;
-        height: 60vh;
+        width: 100%;
         filter: brightness(40%);
     }
     
@@ -708,13 +727,13 @@
     .upload-avatar-area {
         display: flex;
         flex-direction: column;
-        justify-content: space-between;
+        justify-content: space-around;
         align-items: center;
         position: relative;
-        height: 100%;
-        width: 40%;
+        width: 50%;
         border-radius: 5px;
         color: rgba(255, 255, 255, 0.384);
+        margin: 3vw 5vw;
     }
     
     .avatar-upload-button {
@@ -723,15 +742,18 @@
         justify-content: center;
         position: relative;
         top: 0;
-        margin: 10% 0;
     }
     
     .avatar-drop-area {
         position: relative;
-        width: 95%;
-        height: 60%;
+        flex-grow: 1;
+        width: 100%;
         border-color: rgb(124, 124, 124);
-        margin: 10px;
+        margin: 2vw 0;
+    }
+    
+    .upload-area_highlight {
+        border-color: #ede9ffc7;
     }
     
     .inputfile {
@@ -818,5 +840,85 @@
             top: 0px;
             width: 160px;
             height: 36px;
+        }
+    }
+    
+    .lds-grid {
+        display: inline-block;
+        position: relative;
+        width: 64px;
+        height: 64px;
+    }
+    
+    .lds-grid div {
+        position: absolute;
+        width: 13px;
+        height: 13px;
+        border-radius: 50%;
+        background: #fff;
+        animation: lds-grid 1.2s linear infinite;
+    }
+    
+    .lds-grid div:nth-child(1) {
+        top: 6px;
+        left: 6px;
+        animation-delay: 0s;
+    }
+    
+    .lds-grid div:nth-child(2) {
+        top: 6px;
+        left: 26px;
+        animation-delay: -0.4s;
+    }
+    
+    .lds-grid div:nth-child(3) {
+        top: 6px;
+        left: 45px;
+        animation-delay: -0.8s;
+    }
+    
+    .lds-grid div:nth-child(4) {
+        top: 26px;
+        left: 6px;
+        animation-delay: -0.4s;
+    }
+    
+    .lds-grid div:nth-child(5) {
+        top: 26px;
+        left: 26px;
+        animation-delay: -0.8s;
+    }
+    
+    .lds-grid div:nth-child(6) {
+        top: 26px;
+        left: 45px;
+        animation-delay: -1.2s;
+    }
+    
+    .lds-grid div:nth-child(7) {
+        top: 45px;
+        left: 6px;
+        animation-delay: -0.8s;
+    }
+    
+    .lds-grid div:nth-child(8) {
+        top: 45px;
+        left: 26px;
+        animation-delay: -1.2s;
+    }
+    
+    .lds-grid div:nth-child(9) {
+        top: 45px;
+        left: 45px;
+        animation-delay: -1.6s;
+    }
+    
+    @keyframes lds-grid {
+        0%,
+        100% {
+            opacity: 1;
+        }
+        50% {
+            opacity: 0.5;
         }
     }

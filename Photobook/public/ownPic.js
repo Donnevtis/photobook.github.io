@@ -1,50 +1,35 @@
-// Avatar redactor
 const avatarArea = document.querySelector('.photo-redactor__img');
 const avatarFade = document.querySelector('.photo-redactor__img_fade');
+
 const avatarThumb = document.querySelector('.photo-redactor__cropper');
 const avatarCircle = document.querySelector('.photo-redactor__cropper_circle')
 const redactor = document.querySelector('.photo-redactor');
-const image = document.querySelector('.photo-redactor__img');
 const ltThumb = document.querySelector('.photo-redactor__thumb_LT');
 const rtThumb = document.querySelector('.photo-redactor__thumb_RT');
 const lbThumb = document.querySelector('.photo-redactor__thumb_LB');
 const rbThumb = document.querySelector('.photo-redactor__thumb_RB');
-let shiftOffsetX = 0;
-let cropOffsetX = 0;
+
+
+let width = avatarFade.clientWidth;
+let height = avatarFade.offsetHeight;
+let style = getComputedStyle(avatarFade);
+avatarArea.style.width = width + 'px'
+avatarArea.style.height = height + 'px'
+console.log(width)
+redactor.style.width = width + 'px'
 
 
 
-// Picture shift
-avatarFade.onmousedown = function(e) {
-
-    let offsetX = avatarFade.offsetLeft;
-    let cursor = e.clientX - offsetX;
-    moveAt(e);
-
-    document.onmousemove = function(e) {
-        moveAt(e);
-    }
-
-    function moveAt(e) {
-
-        let x = e.clientX - cursor;
-        let offset = Math.max(Math.min(x, 0), redactor.clientWidth - image.clientWidth);
-        avatarFade.style.left = offset + 'px';
-
-        shiftOffsetX = offset;
-
-        thumbShifter(shiftOffsetX, cropOffsetX);
-
-        document.onmouseup = function() {
-            document.onmousemove = null;
-        }
-    }
+let originSize = 100;
+avatarArea.onload = (e) => {
+    originSize = e.target.naturalWidth;
 }
+
 
 //Thumb shift
 avatarThumb.onmousedown = function(e) {
 
-    const thumbWidth = avatarThumb.clientWidth;
+
     const startX = avatarThumb.offsetLeft;
     const startY = avatarThumb.offsetTop;
     const avatarStartX = avatarArea.offsetLeft;
@@ -53,6 +38,7 @@ avatarThumb.onmousedown = function(e) {
     const rightBoard = redactor.clientWidth;
     const topBoard = redactor.getBoundingClientRect().top;
     const bottomBoard = redactor.clientHeight;
+    const thumbWidth = avatarThumb.clientWidth;
 
     if (e.target !== avatarArea) {
         resizer()
@@ -144,12 +130,12 @@ avatarThumb.onmousedown = function(e) {
             avatarCircle.style.width = thumbWidth + s + 'px';
             avatarCircle.style.height = thumbWidth + s + 'px';
             avatarArea.style.cursor = 'se-resize';
-            avatarFade.style.cursor = 'se-resize';
+            redactor.style.cursor = 'se-resize';
 
             document.onmouseup = function() {
-                if (e.target == ltThumb || e.target == lbThumb) cropOffsetX += s;
+
                 avatarArea.style.cursor = 'move';
-                avatarFade.style.cursor = 'grab';
+                redactor.style.cursor = 'grab';
                 document.onmousemove = null;
             }
         }
@@ -181,9 +167,8 @@ avatarThumb.onmousedown = function(e) {
         avatarThumb.style.top = y + 'px';
 
 
-        cropOffsetX = -x;
-        thumbShifter(shiftOffsetX, cropOffsetX);
 
+        avatarArea.style.left = -x + 'px';
         avatarArea.style.top = -y + 'px';
         document.onmouseup = function() {
             document.onmousemove = null;
@@ -191,14 +176,15 @@ avatarThumb.onmousedown = function(e) {
     }
 }
 
-function thumbShifter(a, b) {
-    avatarArea.style.left = a + b + 'px';
+
+function getCoords() {
+    let coords = {};
+    let scale = originSize / avatarArea.clientWidth;
+    console.log(scale)
+    coords.width = avatarThumb.clientWidth * scale;
+    coords.left = (avatarThumb.offsetLeft - avatarFade.offsetLeft) * scale;
+    coords.top = (avatarThumb.offsetTop - avatarFade.offsetTop) * scale;
+    return coords;
 }
 
-document.ondragstart = function() {
-    return false;
-};
-
-// Avatar uploader 
-// const avatarDropArea = document.querySelectorAll('.avatar-upload-area');
-// setDragDrop(avatarDropArea);
+document.ondragstart = () => false;

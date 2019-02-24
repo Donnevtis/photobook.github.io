@@ -1,20 +1,21 @@
-const mongoose = require('mongoose');
-
-// Album Schema
+const mongoose = require('mongoose'),
+    Schema = mongoose.Schema
+    // Album Schema
 
 let albumSchema = mongoose.Schema({
+    date: {
+        type: Date,
+        default: Date.now
+    },
     title: {
         type: String,
         required: true
     },
-    user: {
-        type: String,
-        required: true
+    owner: {
+        type: Schema.Types.ObjectId,
+        ref: 'User'
     },
-    file: {
-        type: Array,
-        required: true
-    }
+    files: Array
 });
 
 

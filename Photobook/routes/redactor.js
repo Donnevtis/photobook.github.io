@@ -1,19 +1,23 @@
 const express = require('express');
+const mkdirp = require('mkdirp');
 const router = express.Router();
 const multer = require('multer');
 const sharp = require('sharp');
-let User = require('../models/user');
-let avatar = '/photo/avatar/rustic.png';
+const User = require('../models/user');
+let avatar = '/photo/avatar/shvejtsariya.jpg';
 
 //Multer settings
 const storage = multer.diskStorage({
-        destination: 'public/photo/avatar',
-        filename: function(req, file, cb) {
+        destination: (req, file, cb) => {
+            const path = `./users/${req.user.username}/photo/avatar`;
+            mkdirp.sync(path);
+            cb(null, path)
+        },
+        filename: (req, file, cb) => {
             cb(null, file.originalname)
         }
     })
     // const storage = multer.memoryStorage();
-
 
 function fileFilter(req, file, cb) {
     const fileTypes = /jpeg|jpg|png/;
@@ -23,7 +27,6 @@ function fileFilter(req, file, cb) {
         return cb(null, true)
     else
         return cb('Do not supporting type', false);
-
 }
 
 const upload = multer({
@@ -35,17 +38,21 @@ const upload = multer({
 
 // Show avatar redactor
 router.get('/', (req, res) => {
+    avatar = req.user.avatar || avatar;
     res.render('redactor', { avatar: avatar })
 })
 
 //Get picture
 .post('/upload', function(req, res) {
     upload(req, res, err => {
-        if (err) console.log(err)
-        else {
-            avatar = `/photo/avatar/${req.file.filename}`;
-            res.render('redactor', { avatar: avatar })
-        }
+        if (err) {
+            console.log(err);
+            res.status(300).send(err);
+        } else {
+            avatar = `/users/${req.user.username}/photo/avatar/${req.file.originalname}`;
+            res.render('redactor', { avatar: avatar });
+        };
+
     })
 
 })
@@ -54,13 +61,13 @@ router.get('/', (req, res) => {
 .post('/save', (req, res) => {
     let coords = req.body;
     for (let key in coords) {
-        coords[key] = Math.round(coords[key]);
+        coords[key] = Math.floor(coords[key]);
     }
-    sharp('./public/' + avatar)
+    sharp('.' + avatar)
         .extract({ left: coords.left, top: coords.top, width: coords.width, height: coords.width })
         .resize(80)
         .toBuffer()
-        .then(pic => User.findOneAndUpdate({ _id: req.user._id }, { pic: pic }, { upsert: true }, () => res.sendStatus(201)))
+        .then(pic => User.findOneAndUpdate({ _id: req.user._id }, { pic: pic, avatar: avatar }, { upsert: true }, () => res.sendStatus(201)))
         .catch(err => console.log(err))
 })
 

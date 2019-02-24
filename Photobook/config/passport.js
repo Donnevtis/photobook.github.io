@@ -13,7 +13,7 @@ module.exports = function(passport) {
         User.findOne(query, function(err, user) {
             if (err) throw err;
             if (!user) {
-                return done(null, false, console.log('not user'));
+                return done(null, false, { message: 'Wrong username' });
             }
 
             // Match password

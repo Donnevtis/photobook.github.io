@@ -2,14 +2,9 @@
 const express = require('express');
 const path = require('path');
 const port = process.env.PORT || 1337;
-const multer = require('multer');
 const session = require('express-session');
 const bodyParser = require('body-parser');
 const passport = require('passport');
-
-
-// Files upload routes
-const upload = multer({ dest: 'uploads/' });
 
 // Init App
 const app = express();
@@ -21,15 +16,12 @@ app.disable('x-powered-by');
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
 
-// Public folder route
-app.use(express.static(path.join(__dirname, 'public')));
-
 // Express Session Middleware
 let sessionStore = require('./config/store');
-if (app.get('env') !== 'development') {
-    console.log('dev');
-    sessionStore = '';
-}
+// if (app.get('env') !== 'development') {
+//     console.log('dev');
+//     sessionStore = '';
+// }
 app.use(session({
     secret: 'keyboard cat',
     key: "sid",
@@ -55,46 +47,49 @@ require('./config/passport')(passport);
 app.use(passport.initialize());
 app.use(passport.session());
 
+// Load View Engine
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'pug');
+
+// Routes
+// Public folder route
+app.use(express.static(path.join(__dirname, 'public')));
+
 app.get('*', function(req, res, next) {
     // console.log(req.user)
     res.locals.user = req.user || null;
     next();
 })
 
-// Bring in Models
-let Album = require('./models/album');
-
-// Load View Engine
-app.set('views', path.join(__dirname, 'views'));
-app.set('view engine', 'pug');
-
-// New album route
-app.post('/create', function(req, res) {
-    console.log(req.body.title);
-});
-
-// Load files route
-app.post('/photos/upload', upload.array('file', 12), function(req, res, next) {
-    console.log(req.files);
-    res.send('200');
-});
-
 // Home route
-app.get('/', function(req, res) {
-    let fullname = 'dev env'
-    if ('user' in req) {
-        fullname = req.user.fullname;
-    }
-    if (!req.isAuthenticated() && app.get('env') === 'production') {
-        res.redirect('/user/login');
-    } else res.render('index', { fullname: fullname });
-});
+let main = require('./routes/main');
+app.use('/', main);
 
-// route users
+// Route users
 let users = require('./routes/users');
 app.use('/user', users);
 
-//redactor route
+// New album route
+const createAlbum = require('./routes/create_album');
+app.use('/create', createAlbum);
+
+// Upload files route
+let uploads = require('./routes/upload_files');
+app.use('/upload', uploads);
+
+//Download files route
+app.get('/users/*', (req, res, next) => {
+    let user = req.originalUrl.split('/')[2];
+    if (!req.isAuthenticated() && app.get('env') === 'production') {
+        res.redirect('/user/login');
+    } else if (user != req.user.username) {
+        res.end('bad request');
+    } else next();
+
+})
+app.use('/users', express.static(path.join(__dirname, 'users')));
+
+// Redactor route
 let redactor = require('./routes/redactor')
 app.use('/redactor', redactor);
 

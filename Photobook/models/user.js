@@ -19,6 +19,7 @@ let userSchema = mongoose.Schema({
         type: String,
         required: true
     },
+    avatar: String,
     pic: Buffer
 
 });
