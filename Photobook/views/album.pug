@@ -1,15 +1,8 @@
 each album in albums
-    .album
+    .album(id=album._id)
+        a(name=album.title)
         .album__title #{album.title}
             span.album__count (#{album.count} photos)
-        .album__grid        
-            if album.files
-                each file in album.files
-                    .album-cell
-                        img.album-cell__img(src=file.miniature, width='100%', height='100%')
-                        .album-cell__meta
-                            .album-cell__time #{file.data.time}
-                            .album-cell__f #{file.data.aperture}
-                            .album-cell__shotter #{file.data.exposure}
-                            .album-cell__iso #{file.data.iso}
-                        .album-cell__date #{file.data.date}
+        .album__grid  
+            include photos.pug    
+           

@@ -1,6 +1,5 @@
 const slider = document.querySelector('.scale__slider'),
     fillLine = document.querySelector('.scale_slider-fill'),
-    photoGrid = document.querySelectorAll('.album__grid'),
     sidebarButton = document.querySelector('.sidebar-button'),
     sidebar = document.querySelector('.sidebar'),
     content = document.querySelector('.content'),
@@ -8,11 +7,12 @@ const slider = document.querySelector('.scale__slider'),
     menuButton = document.querySelector('.menu__button'),
     newAlButton = document.querySelector('.menu__new-album'),
     logout = document.querySelector('.logout-button');
+let photoGrid = document.querySelectorAll('.album__grid');
 let areas = [];
 
 // Fetch methods
-function fetchGet(url, callback) {
-    fetch('redactor', { method: 'GET' })
+function fetchGet(url, callback, method) {
+    fetch(url, { method: method || 'GET' })
         .then((res) => {
             if (res.status !== 200) {
                 console.warn(`Looks like a problem. Status Code: ${res.status}`);
@@ -22,8 +22,6 @@ function fetchGet(url, callback) {
             }
         })
         .then(callback)
-
-
 }
 
 function uploadFile(files, url, callback, title) {
@@ -52,7 +50,6 @@ function uploadFile(files, url, callback, title) {
 };
 
 
-window.onload = setGrid(4, 12.5);
 
 slider.addEventListener('input', lineSetPos);
 
@@ -67,68 +64,91 @@ if (FIREFOX) {
 }
 
 //scale grid
-slider.addEventListener('input', gridScale);
+const grid = setGrid();
 
-function gridScale(e) {
-    let val = e.target.value;
+slider.addEventListener('input', grid);
+window.onload = grid();
 
+function gridScale(val) {
+    const size = {};
     switch (val) {
         case '0':
-            setGrid(6, 7.5)
+            {
+                size.col = 6;
+                size.vw = 7.5;
+            }
             break;
         case '25':
-            setGrid(5, 10)
+            {
+                size.col = 5;
+                size.vw = 10;
+            }
             break;
         case '50':
-            setGrid(4, 12.5)
+            {
+                size.col = 4;
+                size.vw = 12.5;
+            }
             break;
         case '75':
-            setGrid(3, 16)
+            {
+                size.col = 3;
+                size.vw = 16;
+            }
             break;
         case '100':
-            setGrid(2, 22)
+            {
+                size.col = 2;
+                size.vw = 22;
+            }
             break;
     }
+    return size;
 }
 
-function setGrid(col, vw) {
-    removeArea();
+function setGrid(e) {
+    let val = '50';
+    return function(e) {
+        removeArea();
+        val = (typeof(e) == 'object') ? e.target.value : val;
+        const size = gridScale(val);
 
-    let r = 2;
+        photoGrid.forEach(elem => {
 
-    photoGrid.forEach(elem => {
+            let r = 2;
+            let cells = elem.children;
 
-        let cells = elem.children;
-
-        for (const cell of cells) {
-            cell.style.display = 'block'
-        }
-
-        if (col <= 4) {
-            if (cells.length > col * 2) {
-                for (let i = col * 2; i < cells.length; i++) {
-                    cells[i].style.display = 'none';
-                }
-            } else {
-                r = (cells.length / col || 1);
-                r = Math.ceil(r);
+            for (const cell of cells) {
+                cell.style.display = 'block'
             }
 
-        } else if (col == 5 || col == 6) {
-            r = 3;
-            if (cells.length > col * 3) {
-                for (let i = col * 3; i < cells.length; i++) {
-                    cells[i].style.display = 'none';
+            if (size.col <= 4) {
+                if (cells.length > size.col * 2) {
+                    for (let i = size.col * 2; i < cells.length; i++) {
+                        cells[i].style.display = 'none';
+                    }
+                } else {
+                    r = (cells.length / size.col || 1);
+                    r = Math.ceil(r);
                 }
-            } else {
-                r = (cells.length / col);
-                r = Math.ceil(r);
-            }
-        }
 
-        elem.style.gridTemplateColumns = `repeat(${col},1fr)`;
-        elem.style.gridTemplateRows = `repeat(${r} ,${vw}vw)`;
-    });
+            } else if (size.col == 5 || size.col == 6) {
+                r = 3;
+                if (cells.length > size.col * 3) {
+                    for (let i = size.col * 3; i < cells.length; i++) {
+                        cells[i].style.display = 'none';
+                    }
+                } else {
+                    r = (cells.length / size.col);
+                    r = Math.ceil(r);
+                }
+            }
+
+            elem.style.gridTemplateColumns = `repeat(${size.col},1fr)`;
+            elem.style.gridTemplateRows = `repeat(${r} ,${size.vw}vw)`;
+        });
+
+    }
 
 }
 
@@ -180,6 +200,7 @@ function addUploadAreas(elem) {
     let url = 'upload/';
     let title = elem.previousSibling.firstChild.data;
 
+    // Appear new files function
     const callback = (res) => {
         removeArea();
         const container = document.createElement('div');
@@ -193,8 +214,8 @@ function addUploadAreas(elem) {
         const counter = elem.previousSibling.lastChild;
         let count = counter.innerHTML.replace(/\D/g, '');
         let countAll = counterAll.innerHTML.replace(/\D/g, '');
-        counter.innerHTML = `(${length + +count} photos)`;
-        counterAll.innerHTML = `${length + +countAll} photos`;
+        counter.innerHTML = `(${length + +count} files)`;
+        counterAll.innerHTML = `${length + +countAll} files`;
 
         let input = new Event('input');
         slider.dispatchEvent(input);
@@ -288,22 +309,30 @@ function sendAlbum(e) {
             if (res.status !== 200) {
                 console.warn(`Looks like a problem. Status Code: ${res.status}`);
                 return;
-            } else showAlbum(title);
-        });
+            } else {
+                return res.json();
+            }
+        })
+        .then(res => {
+            showAlbum(title, res);
+        })
+
     e.target.value = '';
     e.target.removeEventListener('keydown', sendAlbum);
 }
 
-function showAlbum(title) {
+function showAlbum(title, res) {
     let album = document.querySelector('.album');
     const actions = document.querySelector('.actions')
     album = album.cloneNode(true);
     const albumGrid = album.lastChild;
+    album.id = res;
     album.firstChild.firstChild.data = title;
     album.firstChild.lastChild.innerHTML = '(0 photos)';
     albumGrid.innerHTML = '';
     actions.after(album);
     addUploadAreas(albumGrid);
+    photoGrid = document.querySelectorAll('.album__grid');
     // Menu item
     let menuItem = document.querySelectorAll('label.menu__option');
     menuItem = menuItem[menuItem.length - 1].cloneNode(true);

@@ -89,6 +89,10 @@ app.get('/users/*', (req, res, next) => {
 })
 app.use('/users', express.static(path.join(__dirname, 'users')));
 
+// Open album route
+let album = require('./routes/album');
+app.use('/album', album);
+
 // Redactor route
 let redactor = require('./routes/redactor')
 app.use('/redactor', redactor);

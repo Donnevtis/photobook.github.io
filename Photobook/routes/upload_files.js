@@ -58,16 +58,16 @@ router.post('/', function(req, res) {
     async function getFiles(album, files) {
         const createHash = crypto.createHash('sha1').setEncoding('hex'),
             stack = [];
-        let path = `./users/${req.user.username}/photo/${req.body.title}/`;
-        let miniature;
-        let data = null;
-        mkdirp(path + 'mini/', err => {
+        const fullpath = `./users/${req.user.username}/photo/${req.body.title}/mini/`;
+        mkdirp(fullpath, err => {
             if (err) {
                 console.log(err);
             }
         });
         for (let file of files) {
-
+            let path = null;
+            let miniature = null;
+            let data = null;
             const hash = await checkSum(file.path);
             const match = await Files.findOne({ hash: hash });
 
@@ -93,10 +93,10 @@ router.post('/', function(req, res) {
                             image
                                 .resize({ width: 700 })
                                 .flatten(true)
-                                .toFile(path + 'mini/' + file.filename)
+                                .toFile(fullpath + file.filename)
                                 .then(null, err => console.log(err));
-                            miniature = path + 'mini/' + file.filename;
-                            path = path + file.filename;
+                            miniature = fullpath + file.filename;
+                            path = file.path;
                         }
                     });
             }
@@ -127,7 +127,6 @@ router.post('/', function(req, res) {
         let originalname = file.originalname;
         let owner = req.user._id;
         let data = datas || getData(file);
-
         let newFile = new Files({
             album: album,
             originalname: originalname,

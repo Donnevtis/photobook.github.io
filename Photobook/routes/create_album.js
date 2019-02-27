@@ -8,11 +8,14 @@ router.post('/', (req, res) => {
         title: title,
         owner: req.user._id
     });
-    newAlbum.save(err => {
+    newAlbum.save((err, product) => {
         if (err) {
             console.log(err);
             res.status(500).send(err);
-        } else res.sendStatus(200);
+        } else {
+            console.log(product._id)
+            res.json(product._id);
+        }
     })
 
 
