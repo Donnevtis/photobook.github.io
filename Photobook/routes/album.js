@@ -1,4 +1,5 @@
 const express = require('express');
+const fs = require('fs');
 const router = express.Router();
 const Albums = require('../models/album');
 const Files = require('../models/files');
@@ -21,30 +22,67 @@ router.get('/*', (req, res) => {
             return album;
         }
     })
-    .delete('/remove/*', (req, res) => {
-        const title = req.url.substring(8).replace('%20', ' ');
-        Albums.findOneAndDelete({ title: title })
-            .then(album => {
-                    Files.deleteMany({ album: album._id || null })
-                },
-                err => {
-                    console.log(err);
-                })
-            .then(() => {
-                Finder(req, res)
-                    .then(albums => {
-                        let count = 0;
-                        albums.forEach(album => {
-                            count += album.count;
-                        });
-
-                        res.render('album', {
-                            albums: albums
-                        });
-
-                    })
-            })
-
+    .post('/', (req, res) => {
+        const mail = req.body;
+        Albums.findByIdAndUpdate(mail.album, { title: mail.newName })
+            .then(() => res.end(),
+                err => res.status(400).send(err)
+            );
     })
+
+.delete('/', (req, res) => {
+    Albums.findByIdAndDelete(req.body.id)
+        .then(album => {
+                Files.find({ album: album._id })
+                    .then(files => findAndDelete(files, req, album)
+                        .then(col => {
+                            if (files.length == col) {
+                                const path = `./users/${req.user.username}/photo/${album._id}`
+                                fs.rmdir(path + '/mini', err => {
+                                    if (err) console.log(err);
+                                    setTimeout(() => {
+                                        fs.rmdir(path, err => {
+                                            if (err) console.log(err);
+                                        })
+                                    }, 1000)
+                                });
+                            }
+                        }))
+                return Files.deleteMany({ album: album._id })
+            },
+            err => {
+                res.status(400).send(err)
+            })
+        .then(e => {
+                res.send(e.n.toString()).end();
+            },
+            err => {
+                console.log(err);
+                res.status(400).send(err)
+            })
+})
+
+async function findAndDelete(files, req, album) {
+
+    const match = files.map(async file => {
+        const match = await Files.findOne({ owner: req.user.id, hash: file.hash }).exec();
+        if (match) file = null;
+        return file;
+    })
+
+
+    let matches = await Promise.all(match)
+    matches = matches.filter(item => {
+        return item ? true : false;
+    })
+
+    for await (const file of matches) {
+        fs.unlink('./' + file.originalpath, err => { if (err) console.log(err) })
+        fs.unlink(file.miniature, err => { if (err) console.log(err) })
+    }
+    return matches.length;
+
+}
+
 
 module.exports = router;

@@ -284,6 +284,7 @@
         overflow-y: scroll;
         height: 100%;
         flex-grow: 1;
+        scroll-behavior: smooth;
     }
     
     .menu__options_sticky::-webkit-scrollbar-thumb {
@@ -541,6 +542,11 @@
         z-index: 0;
     }
     
+    .album__anchor {
+        border-top: 20px solid transparent;
+        margin-top: -20px;
+    }
+    
     .upload-area:hover {
         border: 3px dashed #ede9ffc7;
     }
@@ -550,19 +556,95 @@
     }
     
     .album__title {
+        position: relative;
+        margin-bottom: 13px;
+        padding: 5px 10px;
+        border-radius: 5px;
+        cursor: pointer;
+        width: 100%;
+        transition: background-color .2s;
+    }
+    
+    .album__name {
+        left: 0;
         font-size: 22px;
         font-family: "Helvetica Neue";
         color: rgb(68, 68, 68);
-        position: relative;
         letter-spacing: 0.05em;
-        margin-bottom: 13px;
-        padding: 5px;
+        vertical-align: baseline;
         border-radius: 5px;
-        cursor: pointer;
+    }
+    
+    .input-buffer {
+        white-space: nowrap;
+        position: absolute;
+        top: -1000px;
+        left: -1000px;
+        visibility: hidden;
     }
     
     .album__title:hover {
-        background-color: rgba(68, 68, 68, 0.137);
+        background-color: #E1E1E1;
+    }
+    
+    .album__title_active {
+        background-color: #E1E1E1;
+    }
+    
+    .album__title_edit {
+        background-color: #E1E1E1;
+    }
+    
+    .album__settings-wrap {
+        float: right;
+        position: relative;
+        opacity: 0;
+        width: 90px;
+        height: 28px;
+        transition: opacity .2s;
+    }
+    
+    .album__settings,
+    .album__del,
+    .album__edit {
+        position: absolute;
+        right: 0;
+        width: 28px;
+        height: 28px;
+        padding: 5px;
+        border-radius: 5px;
+        background-color: #E1E1E1;
+        transition: background-color .2s, transform .3s ease-in-out;
+    }
+    
+    .album__settings {
+        z-index: 10;
+    }
+    
+    .album__edit_show {
+        transform: translateX(-62px)
+    }
+    
+    .album__del_show {
+        transform: translateX(-31px)
+    }
+    
+    .album__settings:hover,
+    .album__del:hover,
+    .album__edit:hover {
+        background-color: #FAFAFA;
+    }
+    
+    .album__title_active .album__settings-wrap {
+        opacity: 1;
+    }
+    
+    .album__title_edit .album__settings-wrap {
+        opacity: 1;
+    }
+    
+    .album__title:hover .album__settings-wrap {
+        opacity: 1;
     }
     
     .album__count {
@@ -571,7 +653,8 @@
         color: rgb(192, 192, 192);
         text-align: left;
         letter-spacing: initial;
-        margin-left: 6px;
+        padding-left: 6px;
+        bottom: 0;
     }
     
     .album__grid {
@@ -962,4 +1045,18 @@
         50% {
             opacity: 0.5;
         }
+    }
+    
+    .server-popup {
+        display: block;
+        position: absolute;
+        z-index: 20;
+        width: auto;
+        padding: 15px;
+        left: calc(50%);
+        transform: translateX(-50%);
+        background-color: rgb(153, 37, 59);
+        border-radius: 5px;
+        font-size: 18px;
+        line-height: initial;
     }

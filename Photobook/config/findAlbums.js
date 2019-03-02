@@ -19,7 +19,7 @@ module.exports = function(req, res) {
                 })()
 
             } else {
-                reject('no one albums')
+                reject(null);
             }
         });
     })

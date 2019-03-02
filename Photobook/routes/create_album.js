@@ -13,8 +13,7 @@ router.post('/', (req, res) => {
             console.log(err);
             res.status(500).send(err);
         } else {
-            console.log(product._id)
-            res.json(product._id);
+            res.render('album', { albums: [product] });
         }
     })
 

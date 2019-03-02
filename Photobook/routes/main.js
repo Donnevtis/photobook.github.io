@@ -29,6 +29,12 @@ router.get('/', function(req, res) {
                     count: count
                 });
 
+            }, err => {
+                if (err) req.flash('error', err || 'database do not answer');
+
+                res.render('index', {
+                    fullname: fullname
+                })
             })
 
     }

@@ -24,10 +24,10 @@ function fetchGet(url, callback, method) {
         .then(callback)
 }
 
-function uploadFile(files, url, callback, title) {
+function uploadFile(files, url, callback, id) {
     let formData = new FormData()
     let arr = [];
-    formData.append('title', title);
+    formData.append('id', id);
     ([...files]).forEach(file => arr.push(file));
     arr.forEach(file => formData.append('file', file));
     fetch(url, {
@@ -109,10 +109,9 @@ function gridScale(val) {
 function setGrid(e) {
     let val = '50';
     return function(e) {
-        removeArea();
+        // removeArea();
         val = (typeof(e) == 'object') ? e.target.value : val;
         const size = gridScale(val);
-
         photoGrid.forEach(elem => {
 
             let r = 2;
@@ -146,8 +145,9 @@ function setGrid(e) {
 
             elem.style.gridTemplateColumns = `repeat(${size.col},1fr)`;
             elem.style.gridTemplateRows = `repeat(${r} ,${size.vw}vw)`;
-        });
 
+        });
+        return val;
     }
 
 }
@@ -198,7 +198,7 @@ function addUploadAreas(elem) {
     areaInput.multiple = true;
     upArea.append(areaInput);
     let url = 'upload/';
-    let title = elem.previousSibling.firstChild.data;
+    let id = elem.parentNode.id;
 
     // Appear new files function
     const callback = (res) => {
@@ -207,20 +207,33 @@ function addUploadAreas(elem) {
         container.innerHTML += res;
         let cells = container.children;
         const length = cells.length;
+
         for (let i = 0; i < length; i++) {
             elem.prepend(cells[0]);
         }
-        const counterAll = document.querySelector('.profile__count');
-        const counter = elem.previousSibling.lastChild;
-        let count = counter.innerHTML.replace(/\D/g, '');
-        let countAll = counterAll.innerHTML.replace(/\D/g, '');
-        counter.innerHTML = `(${length + +count} files)`;
-        counterAll.innerHTML = `${length + +countAll} files`;
+        const counters = new Counters(length);
+        counters.setGenCount();
+        counters.setCount(elem);
 
         let input = new Event('input');
         slider.dispatchEvent(input);
     }
-    setDragDrop(upArea, url, callback, title);
+    setDragDrop(upArea, url, callback, id);
+}
+
+class Counters {
+    constructor(count) {
+        this.count = count;
+    }
+    setGenCount() {
+        this.node = document.querySelector('.profile__count');
+        this.node.innerHTML = `${this.count + +this.prevCount()} files`;
+    }
+    setCount(elem) {
+        this.node = elem.parentNode.querySelector('.album__count');
+        this.node.innerHTML = `(${this.count + +this.prevCount()} photos)`;
+    }
+    prevCount() { return this.node.innerHTML.replace(/\D/g, '') }
 }
 
 function setDragDrop(elem, url, callback, title) {
@@ -278,8 +291,7 @@ menuButton.addEventListener('click', showInput);
 function showInput() {
     menuButton.removeEventListener('click', showInput);
     menuButton.addEventListener('click', hideInput);
-    newAlButton.addEventListener('keydown', sendAlbum)
-    const event = new Event('focus');
+    newAlButton.addEventListener('keydown', sendAlbum);
     newAlButton.style.display = 'block';
     newAlButton.focus();
 
@@ -294,7 +306,7 @@ function hideInput() {
 
 
 function sendAlbum(e) {
-    const title = e.target.value
+    const title = e.target.value.trim();
     if (e.key !== 'Enter') return;
     hideInput();
     const url = '/create';
@@ -310,7 +322,7 @@ function sendAlbum(e) {
                 console.warn(`Looks like a problem. Status Code: ${res.status}`);
                 return;
             } else {
-                return res.json();
+                return res.text();
             }
         })
         .then(res => {
@@ -323,21 +335,26 @@ function sendAlbum(e) {
 
 function showAlbum(title, res) {
     let album = document.querySelector('.album');
+    const albumNumber = (album) ? +album.firstChild.name + 1 : 0;
     const actions = document.querySelector('.actions')
-    album = album.cloneNode(true);
-    const albumGrid = album.lastChild;
-    album.id = res;
-    album.firstChild.firstChild.data = title;
-    album.firstChild.lastChild.innerHTML = '(0 photos)';
-    albumGrid.innerHTML = '';
-    actions.after(album);
+    const container = document.createElement('div');
+    container.innerHTML = res;
+    const id = container.firstChild.id;
+    container.querySelector('.album__anchor').name = albumNumber;
+    const albumGrid = container.querySelector('.album__grid');
+    albumsEvensHang(container.firstChild);
+    actions.after(container.firstChild);
     addUploadAreas(albumGrid);
     photoGrid = document.querySelectorAll('.album__grid');
+
     // Menu item
-    let menuItem = document.querySelectorAll('label.menu__option');
-    menuItem = menuItem[menuItem.length - 1].cloneNode(true);
-    menuItem.firstChild.data = title;
-    newAlButton.after(menuItem);
+
+    container.innerHTML =
+        `<label class="menu__option"id="${albumNumber}i" name="${id}"onclick="document.location.href='#${albumNumber}'" >${title}
+        <input class="menu__input" type="radio" name="albums">
+        <span class="checkmark"></span></label>`
+
+    newAlButton.after(container.firstChild);
 }
 
 

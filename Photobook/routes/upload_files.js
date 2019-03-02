@@ -3,6 +3,7 @@ const mkdirp = require('mkdirp')
 const router = express.Router();
 const multer = require('multer');
 const sharp = require('sharp');
+
 const exif = require("jpeg-exif");
 const Files = require('../models/files');
 const Album = require('../models/album');
@@ -13,7 +14,7 @@ const fs = require('fs');
 // Multer settings
 let storage = multer.diskStorage({
         destination: (req, file, cb) => {
-            const path = `./users/${req.user.username}/photo/${req.body.title}/`;
+            const path = `./users/${req.user.username}/photo/${req.body.id}/`;
             mkdirp.sync(path);
             cb(null, path)
         },
@@ -46,8 +47,8 @@ router.post('/', function(req, res) {
         if (err) console.log(err)
         else {
 
-            Album.findOne({ owner: req.user._id, title: req.body.title })
-                .then(album => getFiles(album, req.files)
+            Album.findOne({ owner: req.user._id, _id: req.body.id })
+                .then(album => getFiles(album, req.files, req)
                     .then(files => {
                         res.render('cell', { files: files })
                     })
@@ -55,10 +56,9 @@ router.post('/', function(req, res) {
         }
     })
 
-    async function getFiles(album, files) {
-        const createHash = crypto.createHash('sha1').setEncoding('hex'),
-            stack = [];
-        const fullpath = `./users/${req.user.username}/photo/${req.body.title}/mini/`;
+    async function getFiles(album, files, req) {
+        const stack = [];
+        const fullpath = `./users/${req.user.username}/photo/${req.body.id}/mini/`;
         mkdirp(fullpath, err => {
             if (err) {
                 console.log(err);
@@ -69,7 +69,9 @@ router.post('/', function(req, res) {
             let miniature = null;
             let data = null;
             const hash = await checkSum(file.path);
-            const match = await Files.findOne({ hash: hash });
+
+
+            const match = await Files.findOne({ hash: hash, owner: req.user.id });
 
             if (match) {
                 path = match.originalpath;
@@ -82,6 +84,7 @@ router.post('/', function(req, res) {
                     }
                 })
             } else {
+                sharp.cache(false);
                 const image = sharp('./' + file.path);
                 await image
                     .metadata()
@@ -99,14 +102,12 @@ router.post('/', function(req, res) {
                             path = file.path;
                         }
                     });
-            }
 
+            }
 
             newFile = await compileModel(file, album, path, miniature, hash, data);
             if (!newFile) return;
             stack.push(newFile);
-
-
         }
         return (stack);
     }
@@ -117,7 +118,7 @@ router.post('/', function(req, res) {
                 .on('error', reject)
                 .pipe(crypto.createHash('sha1').setEncoding('hex'))
                 .once('finish', function() {
-                    resolve(this.read())
+                    resolve(this.read());
                 })
         })
     }
