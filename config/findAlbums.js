@@ -15,7 +15,7 @@ module.exports = function(req, res) {
                         album.files = await Files.find({ album: album._id }).sort({ 'date': -1 }).limit(18).exec();
                         return album;
                     })
-                    resolve(await Promise.all(prom2));
+                    resolve(await Promise.all(prom2, prom));
                 })()
 
             } else {
