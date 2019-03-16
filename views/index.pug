@@ -1,9 +1,9 @@
 extends layout
 
-block content  
-  body  
-  != messages('messages', locals)   
-  button.sidebar-button(type='button')    
+block content
+  body
+  != messages('messages', locals)
+  button.sidebar-button(type='button')
     .sidebar-button__line
   .box-display
     .sidebar
@@ -13,20 +13,20 @@ block content
             img.profile__avatar(src=`/redactor/avatar/`, alt='avatar')
           else
             img.profile__avatar(src='/photo/avatar/picmin.jpg', alt='avatar')
-          button.profile__avatar-button   
+          button.profile__avatar-button
             | Edit photo
             br
             | ▼
         .profile__name #{fullname}
-        if albums               
+        if albums
           .profile__count #{count} files
         else
           .profile__count 1 file
-        button.upload-button(type='button') upload          
+        button.upload-button(type='button') upload
       .search
         img.search__forma(src='svg/Search.svg', alt='svg')
         input.search__input(type='text', placeholder='Search files')
-      .menues  
+      .menues
         .menu
           .menu__title Categories
           .menu__options
@@ -42,26 +42,26 @@ block content
               | Projects
               input.menu__input(type='radio', name='categories')
               span.checkmark
-        .menu        
+        .menu
           .menu__title
-            a.menu__title.menu__link(href="/") albums         
+            a.menu__title.menu__link(href="/") albums
             svg.menu__button(shape-rendering='crispEdges', version='1.1', xmlns='http://www.w3.org/2000/svg', xmlns:xlink='http://www.w3.org/1999/xlink', x='0px', y='0px', viewBox='0 0 20 20', style='enable-background:new 0 0 20 20;', xml:space='preserve')
               style(type='text/css').
                 .st1{fill:#EA5A5A;}
               rect.st1(x='9', y='4', width='2', height='12')
               rect.st1(x='4', y='9', width='12', height='2')
-        .menu__options.menu__options_sticky         
-            input.menu__new-album(type='text', name='title', placeholder='enter the name') 
-            if albums 
+        .menu__options.menu__options_sticky
+            input.menu__new-album(type='text', name='title', placeholder='enter the name')
+            if albums
               -let i = albums.length;
-              each album in albums                                                           
-                  label.menu__option(id=--i+'i' name=album._id onclick=`document.location.href="#${i}"`) #{album.title}  
+              each album in albums
+                  label.menu__option(id=--i+'i' name=album._id onclick=`document.location.href="#${i}"`) #{album.title}
                     input.menu__input(type="radio" name="albums")
                     span.checkmark
             else
               label.menu__option(id='-1i' name='example' onclick=`document.location.href="#${-1}"`) Instanse album
                   input.menu__input(type="radio" name="albums")
-                  span.checkmark                      
+                  span.checkmark
       .scale
         .scale__grid-small
         div
@@ -71,10 +71,10 @@ block content
     .content
         .input-buffer
         .actions
-          img.slideshow-button(src='svg/slideshowButton.svg')
-          img.share-button(src='svg/slideshowButton.svg')        
-          img.logout-button(src='svg/logout.svg') 
-        if albums 
+          img.action__icon.slideshow-button(src='svg/slideshowButton.svg')
+          img.action__icon.share-button(src='svg/shareButton.svg')
+          img.action__icon.logout-button(src='svg/logout.svg')
+        if albums
           include album.pug
         else
           .album(id='example')
@@ -82,10 +82,10 @@ block content
             .album__title
               span.album__name Instance album
               span.album__count (1 photo)
-              .album__settings-wrap               
-                img.album__settings(src="svg/settings.svg" hidden) 
+              .album__settings-wrap
+                img.album__settings(src="svg/settings.svg" hidden)
                 img.album__del(src="svg/delete.svg" hidden)
-                img.album__edit(src="svg/pencil-edit.svg" hidden) 
+                img.album__edit(src="svg/pencil-edit.svg" hidden)
             .album__grid
               .album-cell
                 img.album-cell__img(src='photo/background.jpg', width='100%', height='100%')
