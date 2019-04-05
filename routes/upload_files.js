@@ -50,8 +50,10 @@ router.post('/', function(req, res) {
         else {
             Album.findOne({ owner: req.user._id, _id: req.body.id })
                 .then(album => getFiles(album, req.files, req)
-                    .then(files => {
-                        res.render('cell', { files: files, user: req.user })
+                    .then(array => {
+                        console.log(array);
+                        // res.send(array[0])
+                        res.render('cell', { files: array, user: req.user })
                     })
                 )
         }
@@ -62,27 +64,29 @@ router.post('/', function(req, res) {
 
         for (let file of files) {
 
-            let min = null;
-
+            let min = false;
+            let minifile = null;
             sharp.cache(false);
             const image = sharp(file.buffer);
             await image
                 .metadata()
-                .then(meta => {
+                .then(async meta => {
                     if (meta.width < 700) {
-                        min = large;
+                        min = true;
                         return null;
-                    } else {
-                        image
-                            .resize({ width: 700 })
-                            .flatten(true)
-                            .toBuffer()
-                            .then(data => min = data)
-                            .then(null, err => console.log(err));
-                    }
-                });
+                    };
+                })
 
-            newFile = await compileModel(file, album, file.buffer, min);
+            if (!min) {
+
+                minifile = await image
+                    .resize({ width: 700 })
+                    .flatten(true)
+                    .toBuffer()
+                    .then(null, err => console.log(err));
+            }
+
+            newFile = await compileModel(file, album, min, minifile);
             if (!newFile) return;
             stack.push(newFile);
         }
@@ -100,7 +104,9 @@ router.post('/', function(req, res) {
         })
     }
 
-    async function compileModel(file, album, min) {
+    async function compileModel(file, album, min, minifile) {
+
+        let id;
         album = album._id;
         let originalname = file.originalname;
         let owner = req.user._id;
@@ -108,7 +114,7 @@ router.post('/', function(req, res) {
         let newFileOrigin = new Files({
             album: album,
             originalname: originalname,
-            min: false,
+            min: min,
             owner: album.owner,
             data: data
         });
@@ -120,12 +126,15 @@ router.post('/', function(req, res) {
             data: data
         });
         try {
-            gridFS.sendFile(file.originalname, file.buffer, newFileOrigin)
-            gridFS.sendFile(file.originalname, min, newFileMin)
+            id = await gridFS.sendFile(file.originalname, file.buffer, newFileOrigin);
+
+            if (!min) {
+                id = await gridFS.sendFile(file.originalname, minifile, newFileMin)
+            }
         } catch (error) {
             res.sendStatus(500)
         }
-        return newFileMin;
+        return [data, id];
     }
 
 

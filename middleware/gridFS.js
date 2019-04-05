@@ -25,15 +25,18 @@ class GridFS {
             metadata: data
         })
         this.id = this.uploadStream.id;
-        console.log(this.id);
 
-        streamifier.createReadStream(file).
-        pipe(this.uploadStream).
-        on('error', function(error) {
-            assert.ifError(error);
-        }).
-        on('finish', function() {
-            console.log('done!');
+
+        return new Promise(resolve => {
+            streamifier.createReadStream(file).
+            pipe(this.uploadStream).
+            on('error', function(error) {
+                assert.ifError(error);
+            }).
+            on('finish', function() {
+                console.log('done!');
+                resolve(this.id)
+            });
         });
     }
 

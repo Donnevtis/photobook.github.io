@@ -8,7 +8,7 @@ router.get('*', (req, res) => {
     const stream = gridFS.download(id)
         .pipe(res);
 
-    stream.on('data', function(data) {
+    stream.on('readable', function(data) {
         res.write(data);
     });
 
