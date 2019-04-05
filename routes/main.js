@@ -16,6 +16,7 @@ router.get('/', function(req, res) {
         let t = Date.now();
         Finder(req, res)
             .then(albums => {
+
                 let count = 0;
                 t = Date.now() - t;
                 console.log(t);

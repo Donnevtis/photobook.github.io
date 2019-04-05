@@ -19,4 +19,4 @@ let albumSchema = mongoose.Schema({
 });
 
 
-let Album = module.exports = mongoose.model('Album', albumSchema)
+module.exports = mongoose.model('Album', albumSchema)

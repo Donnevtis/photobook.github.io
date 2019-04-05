@@ -78,7 +78,8 @@ let uploads = require('./routes/upload_files');
 app.use('/upload', uploads);
 
 //Download files route
-app.get('/users/*', (req, res, next) => {
+const downloads = require('./routes/download')
+app.get('/download/*', (req, res, next) => {
     let user = req.originalUrl.split('/')[2];
     if (!req.isAuthenticated() && app.get('env') === 'production') {
         res.redirect('/user/login');
@@ -87,7 +88,7 @@ app.get('/users/*', (req, res, next) => {
     } else next();
 
 })
-app.use('/users', express.static(path.join(__dirname, 'users')));
+app.use('/download', downloads)
 
 // Open album route
 let album = require('./routes/album');

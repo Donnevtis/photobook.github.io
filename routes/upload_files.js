@@ -1,5 +1,4 @@
 const express = require('express');
-const mkdirp = require('mkdirp')
 const router = express.Router();
 const multer = require('multer');
 const sharp = require('sharp');
@@ -11,18 +10,21 @@ const path = require('path');
 const crypto = require('crypto');
 const fs = require('fs');
 
+const gridFS = require('../middleware/gridFS');
+const streamifier = require('streamifier');
+
 // Multer settings
-let storage = multer.diskStorage({
-        destination: (req, file, cb) => {
-            const path = `./users/${req.user.username}/photo/${req.body.id}/`;
-            mkdirp.sync(path);
-            cb(null, path)
-        },
-        filename: function(req, file, cb) {
-            cb(null, Date.now() + path.extname(file.originalname));
-        }
-    })
-    // storage = multer.memoryStorage();
+// let storage = multer.diskStorage({
+//         destination: (req, file, cb) => {
+//             const path = `./users/${req.user.username}/photo/${req.body.id}/`;
+//             mkdirp.sync(path);
+//             cb(null, path)
+//         },
+//         filename: function(req, file, cb) {
+//             cb(null, Date.now() + path.extname(file.originalname));
+//         }
+//     })
+const storage = multer.memoryStorage();
 
 function fileFilter(req, file, cb) {
     const fileTypes = /jpeg|jpg|png/;
@@ -46,75 +48,50 @@ router.post('/', function(req, res) {
     upload(req, res, err => {
         if (err) console.log(err)
         else {
-
             Album.findOne({ owner: req.user._id, _id: req.body.id })
                 .then(album => getFiles(album, req.files, req)
                     .then(files => {
-                        res.render('cell', { files: files })
+                        res.render('cell', { files: files, user: req.user })
                     })
                 )
         }
     })
 
-    async function getFiles(album, files, req) {
+    async function getFiles(album, files) {
         const stack = [];
-        const fullpath = `./users/${req.user.username}/photo/${req.body.id}/mini/`;
-        mkdirp(fullpath, err => {
-            if (err) {
-                console.log(err);
-            }
-        });
+
         for (let file of files) {
-            let path = null;
-            let miniature = null;
-            let data = null;
-            const hash = await checkSum(file.path);
 
+            let min = null;
 
-            const match = await Files.findOne({ hash: hash, owner: req.user.id });
-
-            if (match) {
-                path = match.originalpath;
-                miniature = match.miniature;
-                data = match.data;
-                fs.unlink('./' + file.path, err => {
-                    if (err) {
-                        console.log(err);
-                        return;
+            sharp.cache(false);
+            const image = sharp(file.buffer);
+            await image
+                .metadata()
+                .then(meta => {
+                    if (meta.width < 700) {
+                        min = large;
+                        return null;
+                    } else {
+                        image
+                            .resize({ width: 700 })
+                            .flatten(true)
+                            .toBuffer()
+                            .then(data => min = data)
+                            .then(null, err => console.log(err));
                     }
-                })
-            } else {
-                sharp.cache(false);
-                const image = sharp('./' + file.path);
-                await image
-                    .metadata()
-                    .then(meta => {
-                        if (meta.width < 700) {
-                            path = miniature = './' + file.path;
-                            return null;
-                        } else {
-                            image
-                                .resize({ width: 700 })
-                                .flatten(true)
-                                .toFile(fullpath + file.filename)
-                                .then(null, err => console.log(err));
-                            miniature = fullpath + file.filename;
-                            path = file.path;
-                        }
-                    });
+                });
 
-            }
-
-            newFile = await compileModel(file, album, path, miniature, hash, data);
+            newFile = await compileModel(file, album, file.buffer, min);
             if (!newFile) return;
             stack.push(newFile);
         }
         return (stack);
     }
 
-    function checkSum(path) {
+    function checkSum(buffer) {
         return new Promise((resolve, reject) => {
-            fs.createReadStream(path)
+            streamifier.createReadStream(buffer)
                 .on('error', reject)
                 .pipe(crypto.createHash('sha1').setEncoding('hex'))
                 .once('finish', function() {
@@ -123,34 +100,38 @@ router.post('/', function(req, res) {
         })
     }
 
-    async function compileModel(file, album, path, miniature, hash, datas) {
+    async function compileModel(file, album, min) {
         album = album._id;
         let originalname = file.originalname;
         let owner = req.user._id;
-        let data = datas || getData(file);
-        let newFile = new Files({
+        let data = getData(file.buffer);
+        let newFileOrigin = new Files({
             album: album,
             originalname: originalname,
+            min: false,
+            owner: album.owner,
+            data: data
+        });
+        let newFileMin = new Files({
+            album: album,
+            originalname: originalname,
+            min: true,
             owner: owner,
-            data: data,
-            originalpath: path,
-            miniature: miniature,
-            hash: hash
+            data: data
         });
         try {
-            newFile.save()
+            gridFS.sendFile(file.originalname, file.buffer, newFileOrigin)
+            gridFS.sendFile(file.originalname, min, newFileMin)
         } catch (error) {
-
             res.sendStatus(500)
-            newFile = null;
         }
-        return newFile;
+        return newFileMin;
     }
 
 
     function getData(file) {
         let values = {};
-        let data = exif.parseSync('./' + file.path);
+        let data = exif.fromBuffer(file);
         let e = data.SubExif;
 
         if (!e) return {};

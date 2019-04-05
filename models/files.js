@@ -4,11 +4,11 @@ const mongoose = require('mongoose'),
 // Album Schema
 
 let filesSchema = mongoose.Schema({
-    date: {
-        type: Date,
-        default: Date.now
-    },
     originalname: {
+        type: String,
+        required: true
+    },
+    min: {
         type: String,
         required: true
     },
@@ -17,8 +17,8 @@ let filesSchema = mongoose.Schema({
         ref: 'Album'
     },
     owner: {
-        type: String,
-        required: true
+        type: Schema.Types.ObjectId,
+        ref: 'User'
     },
     data: {
         date: String,
@@ -26,21 +26,7 @@ let filesSchema = mongoose.Schema({
         aperture: String,
         exposure: String,
         iso: String
-    },
-    originalpath: {
-        type: String,
-        required: true
-    },
-    miniature: {
-        type: String,
-        required: true
-    },
-    hash: {
-        type: String,
-        required: true
-
     }
-
 });
 
 
