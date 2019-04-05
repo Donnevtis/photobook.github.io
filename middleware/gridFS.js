@@ -61,7 +61,7 @@ class GridFS {
 
 }
 
-async function send(name, file, data) {
+function send(name, file, data) {
     return new Promise(resolve => {
         console.log('checks');
         const client = new mongodb.MongoClient(config.uri, { useNewUrlParser: true });
