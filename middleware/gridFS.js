@@ -6,11 +6,11 @@ const streamifier = require('streamifier');
 //gridFS middleware
 class GridFS {
     constructor() {
-        console.log('check');
         this.client = new mongodb.MongoClient(process.env.URI, { useNewUrlParser: true });
         this.FILES_COLL = 'photos.files';
         this.client.connect((error) => {
             this.db = this.client.db();
+            console.log('check');
             this.bucket = new mongodb.GridFSBucket(this.db, {
                 bucketName: 'photos'
             });
@@ -53,10 +53,6 @@ class GridFS {
     download(id) {
         return this.bucket.openDownloadStream(ObjectId(id))
     }
-    closeConnect() {
-        this.client.close();
-    }
-
 }
 
 function send(name, file, data) {
