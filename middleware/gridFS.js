@@ -1,15 +1,13 @@
 const assert = require('assert');
-const fs = require('fs');
 const mongodb = require('mongodb');
 const ObjectId = mongodb.ObjectID;
-const config = require('../config/database');
 const streamifier = require('streamifier');
 
 //gridFS middleware
 class GridFS {
     constructor() {
         console.log('check');
-        this.client = new mongodb.MongoClient(config.uri, { useNewUrlParser: true });
+        this.client = new mongodb.MongoClient(process.env.URI, { useNewUrlParser: true });
         this.FILES_COLL = 'photos.files';
         this.client.connect((error) => {
             this.db = this.client.db();
@@ -61,10 +59,10 @@ class GridFS {
 
 }
 
-function send(name, file, data) {
+async function send(name, file, data) {
     return new Promise(resolve => {
         console.log('checks');
-        const client = new mongodb.MongoClient(config.uri, { useNewUrlParser: true });
+        const client = new mongodb.MongoClient(process.env.URI, { useNewUrlParser: true });
         const FILES_COLL = 'photos.files';
         client.connect((error) => {
             const db = client.db();

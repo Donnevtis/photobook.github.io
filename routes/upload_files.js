@@ -153,9 +153,9 @@ router.post('/', function(req, res) {
             values.time = date[1];
         }
 
-        values.aperture = e.FNumber ? `F/${e.FNumber}` : null;
-        values.exposure = e.ExposureTime ? `1/${1/e.ExposureTime}` : null;
-        values.iso = e.PhotographicSensitivity ? `ISO ${e.PhotographicSensitivity}` : null;
+        values.aperture = e.FNumber ? `F/${e.FNumber}` : undefined;
+        values.exposure = e.ExposureTime ? `1/${1/e.ExposureTime}` : undefined;
+        values.iso = e.PhotographicSensitivity ? `ISO ${e.PhotographicSensitivity}` : undefined;
         return values;
     }
 })

@@ -21,11 +21,26 @@ let filesSchema = mongoose.Schema({
         ref: 'User'
     },
     data: {
-        date: String,
-        time: String,
-        aperture: String,
-        exposure: String,
-        iso: String
+        date: {
+            type: String,
+            default: ''
+        },
+        time: {
+            type: String,
+            default: 'hh:mm:ss'
+        },
+        aperture: {
+            type: String,
+            default: 'F/'
+        },
+        exposure: {
+            type: String,
+            default: 'sec'
+        },
+        iso: {
+            type: String,
+            default: 'ISO'
+        }
     }
 });
 

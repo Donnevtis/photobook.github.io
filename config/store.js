@@ -1,13 +1,11 @@
-const express = require('express');
-const config = require('../config/database');
 const mongoose = require('mongoose');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
 
 
-// mongoose.set('debug', true);
+mongoose.set('debug', true);
 mongoose.set('useFindAndModify', false);
-mongoose.connect(config.uri, { useNewUrlParser: true })
+mongoose.connect(process.env.URI, { useNewUrlParser: true })
     .then(() => {
             console.log('Database ready to use');
         },
