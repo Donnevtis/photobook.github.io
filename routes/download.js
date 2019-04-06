@@ -2,19 +2,18 @@ const express = require('express');
 const router = express.Router();
 const gridFS = require('../middleware/gridFS');
 
-router.get('*', (req, res) => {
+router.get('*', async(req, res) => {
     const id = req.originalUrl.split('/')[3];
+    const grid = new gridFS;
 
-    const stream = gridFS.download(id)
-        .pipe(res);
-
-    stream.on('readable', function(data) {
+    const stream = await grid.download(id);
+    stream.pipe(res).on('readable', function(data) {
         res.write(data);
-    });
-
-    stream.on('end', function() {
+    }).on('end', function() {
         res.end();
     });
+
+
 
 
 })

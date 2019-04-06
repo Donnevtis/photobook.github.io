@@ -3,7 +3,7 @@ const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
 
 
-mongoose.set('debug', true);
+// mongoose.set('debug', true);
 mongoose.set('useFindAndModify', false);
 mongoose.connect(process.env.URI, { useNewUrlParser: true })
     .then(() => {

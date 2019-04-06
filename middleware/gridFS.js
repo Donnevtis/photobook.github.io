@@ -6,66 +6,78 @@ const streamifier = require('streamifier');
 //gridFS middleware
 class GridFS {
     constructor() {
-        this.client = new mongodb.MongoClient(process.env.URI, { useNewUrlParser: true });
         this.FILES_COLL = 'photos.files';
-        this.client.connect((error) => {
-            this.db = this.client.db();
-            console.log('check');
-            this.bucket = new mongodb.GridFSBucket(this.db, {
-                bucketName: 'photos'
-            });
-            this.collection = this.db.collection(this.FILES_COLL)
-        })
+        this.BUCKET_NAME = 'photos';
+        this.client = new mongodb.MongoClient(process.env.URI, { useNewUrlParser: true });
     }
-
-    async sendFile(name, file, data) {
-        this.t = Date.now();
-        this.uploadStream = this.bucket.openUploadStream(name, {
-            metadata: data
-        })
-        this.id = this.uploadStream.id;
+    connect() {
         return new Promise(resolve => {
-            streamifier.createReadStream(file).
-            pipe(this.uploadStream).
-            on('error', function(error) {
+            this.client.connect((error) => {
                 assert.ifError(error);
-            }).
-            on('finish', () => {
-                console.log('done!', (Date.now() - this.t));
-                resolve(this.id)
-
-            });
-        });
-    }
-
-    findFiles(album) {
-        const result = this.db.collection(this.FILES_COLL).find({
-            'metadata.album': album._id,
-            'metadata.min': 'true'
-        }, {
-            sort: [
-                ['uploadDate', -1]
-            ]
+                resolve(this.db = this.client.db());
+            })
         })
-        return result;
+    }
+    getCursor(album) {
+        return new Promise(resolve => {
+            this.connect().then(db => resolve(db.collection(this.FILES_COLL).find({
+                'metadata.album': album._id,
+                'metadata.min': 'true'
+            }, {
+                sort: [
+                    ['uploadDate', -1]
+                ]
+            })))
+        })
+
     }
 
     download(id) {
-        return this.bucket.openDownloadStream(ObjectId(id))
+        return new Promise(resolve => {
+            this.connect().then(db => new mongodb.GridFSBucket(db, {
+                bucketName: 'photos'
+            })).then(bucket => {
+                resolve(bucket.openDownloadStream(ObjectId(id)))
+            })
+            this.close();
+        })
     }
+    close() {
+        this.client.close();
+    }
+
+
 }
+
+// function getCursor(album) {
+//     return new Promise(resolve => {
+//         const client = new mongodb.MongoClient(process.env.URI, { useNewUrlParser: true });
+//         client.connect(function(error) {
+//             assert.ifError(error);
+//             const db = client.db();
+//             resolve(db.collection('photos.files').find({
+//                 'metadata.album': album._id,
+//                 'metadata.min': 'true'
+//             }, {
+//                 sort: [
+//                     ['uploadDate', -1]
+//                 ]
+//             }))
+//         });
+//         client.close()
+//     })
+
+// }
 
 function send(name, file, data) {
     return new Promise(resolve => {
         console.log('checks');
         const client = new mongodb.MongoClient(process.env.URI, { useNewUrlParser: true });
-        const FILES_COLL = 'photos.files';
         client.connect((error) => {
             const db = client.db();
             const bucket = new mongodb.GridFSBucket(db, {
                 bucketName: 'photos'
             });
-            const collection = db.collection(FILES_COLL)
             let t = Date.now();
             const uploadStream = bucket.openUploadStream(name, {
                 metadata: data
@@ -89,5 +101,5 @@ function send(name, file, data) {
 
 
 
-module.exports = new GridFS;
+module.exports = GridFS;
 module.exports.send = send;
