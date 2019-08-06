@@ -1,4 +1,5 @@
 'use strict';
+require('dotenv').config()
 const express = require('express');
 const path = require('path');
 const port = process.env.PORT || 1337;
@@ -18,16 +19,16 @@ app.use(bodyParser.json());
 
 // Express Session Middleware
 let sessionStore = require('./config/store');
-// if (app.get('env') !== 'development') {
-//     console.log('dev');
-//     sessionStore = '';
-// }
+if (app.get('env') === 'development') {
+    console.log('dev');
+    sessionStore = '';
+}
 app.use(session({
     secret: 'keyboard cat',
     key: "sid",
     cookie: {
         httpOnly: true,
-        maxAge: null
+        maxAge: 7 * 24 * 60 * 60 * 1000
     },
     resave: false,
     saveUninitialized: true,

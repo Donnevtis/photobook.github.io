@@ -192,7 +192,7 @@ ClientBin/
 *.jfm
 *.pfx
 *.publishsettings
-node_modules/
+*node_modules/
 orleans.codegen.cs
 
 # Since there are multiple workflows, uncomment next line to ignore bower_components
@@ -258,4 +258,4 @@ paket-files/
 
 # Python Tools for Visual Studio (PTVS)
 __pycache__/
-*.pyc
+*.pycnode_modules

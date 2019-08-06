@@ -44,7 +44,7 @@ const upload = multer({
 }).array('file', 20);
 
 router.post('/', function(req, res) {
-
+    let t = Date.now();
     upload(req, res, err => {
         if (err) console.log(err)
         else {
@@ -52,7 +52,8 @@ router.post('/', function(req, res) {
                 .then(album => getFiles(album, req.files, req)
                     .then(array => {
                         console.log(array);
-                        // res.send(array[0])
+                        console.log(Date.now() - t);
+
                         res.render('cell', { files: array, user: req.user })
                     })
                 )
@@ -60,15 +61,13 @@ router.post('/', function(req, res) {
     })
 
     async function getFiles(album, files) {
-        const stack = [];
 
-        for (let file of files) {
-
+        const stack = await files.map(async file => {
             let min = false;
             let minifile = null;
             sharp.cache(false);
             const image = sharp(file.buffer);
-            await image
+            image
                 .metadata()
                 .then(async meta => {
                     if (meta.width < 700) {
@@ -78,19 +77,18 @@ router.post('/', function(req, res) {
                 })
 
             if (!min) {
-
                 minifile = await image
-                    .resize({ width: 700 })
+                    .resize({ width: 500 })
                     .flatten(true)
                     .toBuffer()
                     .then(null, err => console.log(err));
             }
 
             newFile = await compileModel(file, album, min, minifile);
-            if (!newFile) return;
-            stack.push(newFile);
-        }
-        return (stack);
+            return newFile;
+        })
+
+        return Promise.all(stack);
     }
 
     function checkSum(buffer) {
@@ -126,12 +124,17 @@ router.post('/', function(req, res) {
             data: data
         });
         try {
-            id = await gridFS.sendFile(file.originalname, file.buffer, newFileOrigin);
-
             if (!min) {
-                id = await gridFS.sendFile(file.originalname, minifile, newFileMin)
+
+                id = await gridFS.send(file.originalname, minifile, newFileMin)
+
+                gridFS.send(file.originalname, file.buffer, newFileOrigin);
+            } else {
+                id = await gridFS.sendFile(file.originalname, file.buffer, newFileOrigin);
             }
+
         } catch (error) {
+            console.log(error);
             res.sendStatus(500)
         }
         return [data, id];
@@ -150,9 +153,9 @@ router.post('/', function(req, res) {
             values.time = date[1];
         }
 
-        values.aperture = `F/${e.FNumber}`;
-        values.exposure = `1/${1/e.ExposureTime}`;
-        values.iso = `ISO ${e.PhotographicSensitivity}`;
+        values.aperture = e.FNumber ? `F/${e.FNumber}` : undefined;
+        values.exposure = e.ExposureTime ? `1/${1/e.ExposureTime}` : undefined;
+        values.iso = e.PhotographicSensitivity ? `ISO ${e.PhotographicSensitivity}` : undefined;
         return values;
     }
 })
