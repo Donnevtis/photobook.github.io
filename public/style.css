@@ -740,9 +740,10 @@
     .avatar-changer {
         display: flex;
         justify-content: space-between;
+        align-items: center;
         position: fixed;
         width: 70vw;
-        height: 60vh;
+        /* height: 60vh; */
         background: rgb(30, 29, 38);
         top: 20vh;
         left: 15vw;
@@ -758,6 +759,10 @@
         width: 100%;
     }
     
+    .photo-redactor-wrap.invisible {
+        display: none;
+    }
+    
     .photo-redactor {
         position: relative;
         left: 0;
@@ -766,6 +771,7 @@
         height: 30vw;
         border-radius: 5px;
         overflow: hidden;
+        margin: 20px 0;
     }
     
     .photo-redactor__img-wrap_top {
@@ -855,9 +861,11 @@
         align-items: center;
         position: relative;
         width: 50%;
+        height: 60vh;
         border-radius: 5px;
         color: rgba(255, 255, 255, 0.384);
-        margin: 3vw 5vw;
+        margin: 3vw auto;
+        padding: 3vw;
     }
     
     .avatar-upload-button {

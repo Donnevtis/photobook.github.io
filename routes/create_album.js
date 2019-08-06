@@ -6,7 +6,8 @@ router.post('/', (req, res) => {
     let title = req.body.title;
     let newAlbum = new Album({
         title: title,
-        owner: req.user._id
+        owner: req.user._id,
+        visible: true
     });
     newAlbum.save((err, product) => {
         if (err) {

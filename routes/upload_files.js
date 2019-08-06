@@ -2,14 +2,12 @@ const express = require('express');
 const router = express.Router();
 const multer = require('multer');
 const sharp = require('sharp');
-
 const exif = require("jpeg-exif");
 const Files = require('../models/files');
 const Album = require('../models/album');
 const path = require('path');
 const crypto = require('crypto');
 const fs = require('fs');
-
 const gridFS = require('../middleware/gridFS');
 const streamifier = require('streamifier');
 

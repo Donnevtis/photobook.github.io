@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+Schema = mongoose.Schema
 
 //User Schema
 let userSchema = mongoose.Schema({
@@ -19,8 +20,13 @@ let userSchema = mongoose.Schema({
         type: String,
         required: true
     },
-    avatar: String,
-    pic: Buffer
+    avatarAlbum: {
+        type: Schema.Types.ObjectId,
+        ref: 'Album'
+    },
+    pic: {
+        type: Buffer
+    }
 
 });
 

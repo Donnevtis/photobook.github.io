@@ -3,7 +3,7 @@ const fs = require('fs');
 const router = express.Router();
 const Albums = require('../models/album');
 const Files = require('../models/files');
-const Finder = require('../config/findAlbums');
+const Finder = require('../middleware/findAlbums');
 
 router.get('/*', (req, res) => {
         const _id = req.url.substring(1);

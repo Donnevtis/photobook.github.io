@@ -1,6 +1,6 @@
 const express = require('express');
 const router = express.Router();
-const Finder = require('../config/findAlbums');
+const Finder = require('../middleware/findAlbums');
 const app = express();
 let fullname = 'dev env'
 

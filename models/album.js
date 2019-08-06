@@ -15,6 +15,10 @@ let albumSchema = mongoose.Schema({
         type: Schema.Types.ObjectId,
         ref: 'User'
     },
+    visible: {
+        type: Boolean,
+        require: true
+    },
     files: Array
 });
 
