@@ -14,7 +14,7 @@ router.get('/', function(req, res) {
         res.redirect('/user/login');
     } else {
         let t = Date.now();
-        Finder(req, res)
+        Finder(req, res, true)
             .then(albums => {
 
                 let count = 0;
