@@ -1,0 +1,35 @@
+html(lang='en')
+  head
+    meta(charset='UTF-8')
+    meta(name='viewport', content='width=device-width, initial-scale=1.0, viewport-fit=cover')
+    meta(http-equiv='X-UA-Compatible', content='ie=edge')
+    title Photobook    
+    link(rel='stylesheet', href='/stylereg.css')
+    script(src='/rg_vds2.js', async='')
+    link(rel='apple-touch-icon', sizes='180x180', href='/favicon/apple-touch-icon.png')
+    link(rel='icon', type='image/png', sizes='32x32', href='/favicon/favicon-32x32.png')
+    link(rel='icon', type='image/png', sizes='16x16', href='/favicon/favicon-16x16.png')
+    link(rel='manifest', href='/favicon/site.webmanifest')
+    link(rel='mask-icon', href='/favicon/safari-pinned-tab.svg', color='#5bbad5')
+    meta(name='msapplication-TileColor', content='#da532c')
+    meta(name='theme-color', content='#ffffff')
+  body  
+    .sidebar
+      != messages('messages', locals) 
+      form.form-signup(method='POST' action='/user')
+        .form-signup__title Sign up
+          input.form-signup__input(type='text' name='fullname' placeholder='Fullname...' required value=fullname)
+          input.form-signup__input(type='text' name='username' placeholder='Username...' required minlength='3' value=username)
+          input.form-signup__input(type='email' name='email' placeholder='Email address...' required value=email)
+          input.form-signup__input(type='password', name='password' placeholder='Password...' required minlength='6')
+          input.form-signup__input(type='password', name='password2' placeholder='Confirm password...' required)
+          label.form-signup__checkbox
+            input(type='checkbox' name='checkbox' required)
+            |  I agree to the             
+            a(href='#')
+              b Terms of user
+        .buttons
+          input.signup(type='submit' , value='Sign up')            
+          a.signin(href='/user/login') Sign in →      
+    .background
+    

@@ -1,0 +1,97 @@
+extends layout
+
+block content  
+  body  
+  != messages('messages', locals)   
+  button.sidebar-button(type='button')    
+    .sidebar-button__line
+  .box-display
+    .sidebar
+      .top
+        .profile__avatar-wrap
+          if user.pic
+            img.profile__avatar(src=`/redactor/avatar/`, alt='avatar')
+          else
+            img.profile__avatar(src='/photo/avatar/picmin.jpg', alt='avatar')
+          button.profile__avatar-button   
+            | Edit photo
+            br
+            | ▼
+        .profile__name #{fullname}
+        if albums               
+          .profile__count #{count} files
+        else
+          .profile__count 1 file
+        button.upload-button(type='button') upload          
+      .search
+        img.search__forma(src='svg/Search.svg', alt='svg')
+        input.search__input(type='text', placeholder='Search files')
+      .menues  
+        .menu
+          .menu__title Categories
+          .menu__options
+            label.menu__option
+              | Photos
+              input.menu__input(type='radio', name='categories', checked='checked')
+              span.checkmark
+            label.menu__option
+              | Videos
+              input.menu__input(type='radio', name='categories')
+              span.checkmark
+            label.menu__option
+              | Projects
+              input.menu__input(type='radio', name='categories')
+              span.checkmark
+        .menu        
+          .menu__title
+            a.menu__title.menu__link(href="/") albums         
+            svg.menu__button(shape-rendering='crispEdges', version='1.1', xmlns='http://www.w3.org/2000/svg', xmlns:xlink='http://www.w3.org/1999/xlink', x='0px', y='0px', viewBox='0 0 20 20', style='enable-background:new 0 0 20 20;', xml:space='preserve')
+              style(type='text/css').
+                .st1{fill:#EA5A5A;}
+              rect.st1(x='9', y='4', width='2', height='12')
+              rect.st1(x='4', y='9', width='12', height='2')
+        .menu__options.menu__options_sticky         
+            input.menu__new-album(type='text', name='title', placeholder='enter the name') 
+            if albums 
+              -let i = albums.length;
+              each album in albums                                                           
+                  label.menu__option(id=--i+'i' name=album._id onclick=`document.location.href="#${i}"`) #{album.title}  
+                    input.menu__input(type="radio" name="albums")
+                    span.checkmark
+            else
+              label.menu__option(id='-1i' name='example' onclick=`document.location.href="#${-1}"`) Instanse album
+                  input.menu__input(type="radio" name="albums")
+                  span.checkmark                      
+      .scale
+        .scale__grid-small
+        div
+          input.scale__slider(type='range', min='0', max='100', step='25')
+          .scale_slider-fill
+        .scale__grid-large
+    .content
+        .input-buffer
+        .actions
+          img.slideshow-button(src='svg/slideshowButton.svg')
+          img.share-button(src='svg/shareButton.svg')        
+          img.logout-button(src='svg/logout.svg') 
+        if albums 
+          include album.pug
+        else
+          .album(id='example')
+            a.album__anchor(name=-1)
+            .album__title
+              span.album__name Instance album
+              span.album__count (1 photo)
+              .album__settings-wrap               
+                img.album__settings(src="svg/settings.svg" hidden) 
+                img.album__del(src="svg/delete.svg" hidden)
+                img.album__edit(src="svg/pencil-edit.svg" hidden) 
+            .album__grid
+              .album-cell
+                img.album-cell__img(src='photo/background.jpg', width='100%', height='100%')
+                .album-cell__meta
+                  .album-cell__time 5:40 PM
+                  .album-cell__f f/8
+                  .album-cell__shotter 3s
+                  .album-cell__iso ISO 400
+                .album-cell__date 25.02.2016

@@ -1,0 +1,26 @@
+
+.avatar-changer   
+  .photo-redactor-wrap(class=avatar.length? '' : 'invisible')
+    .photo-redactor
+      if avatar.length
+        img.photo-redactor__img_fade(src=`/download/${user.username}/` + avatar[0]._id, alt='')       
+      else
+        img.photo-redactor__img_fade(src='/photo/avatar/shvejtsariya.jpg', alt='')
+      .photo-redactor__cropper
+        .photo-redactor__cropper.photo-redactor__cropper_circle
+          if avatar.length
+            img.photo-redactor__img(src=`/download/${user.username}/` + avatar[0]._id, alt='')
+          else
+            img.photo-redactor__img(src='/photo/avatar/shvejtsariya.jpg', alt='')
+        .photo-redactor__thumb.photo-redactor__thumb_LT
+        .photo-redactor__thumb.photo-redactor__thumb_RT
+        .photo-redactor__thumb.photo-redactor__thumb_LB
+        .photo-redactor__thumb.photo-redactor__thumb_RB
+  .upload-avatar-area
+    label.avatar-upload-button.upload-button
+      input.inputfile(type='file', name='file', accept='.jpg, .jpeg, .png', multiple = 'true')
+      | Select file
+    .avatar-drop-area.upload-area DROP FILE
+    label.avatar-upload-button.upload-button
+      input.inputfile(type='submit')
+      | Submit

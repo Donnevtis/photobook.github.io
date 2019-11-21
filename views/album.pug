@@ -1,0 +1,14 @@
+-let i = albums.length
+each album in albums
+    .album(id=album._id)
+        a.album__anchor(name=--i)
+        .album__title
+            span.album__name #{album.title}
+            span.album__count (#{album.count || 0} photos)
+            .album__settings-wrap               
+                img.album__settings(src="svg/settings.svg") 
+                img.album__del(src="svg/delete.svg")
+                img.album__edit(src="svg/pencil-edit.svg")                   
+        .album__grid  
+            include photos.pug    
+           

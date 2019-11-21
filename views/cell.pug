@@ -1,0 +1,9 @@
+each file in files
+    .album-cell
+        img.album-cell__img(src=`/download/${user.username}/` + file[1], width='100%', height='100%')
+        .album-cell__meta
+            .album-cell__time #{file[0].time}
+            .album-cell__f #{file[0].aperture}
+            .album-cell__shotter #{file[0].exposure}
+            .album-cell__iso #{file[0].iso}
+        .album-cell__date #{file[0].date}
