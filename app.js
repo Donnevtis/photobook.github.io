@@ -21,7 +21,7 @@ app.use(bodyParser.json());
 let sessionStore = require('./config/store');
 if (app.get('env') === 'development') {
     console.log('dev');
-    sessionStore = '';
+    // sessionStore = '';
 }
 app.use(session({
     secret: 'keyboard cat',
@@ -57,7 +57,6 @@ app.set('view engine', 'pug');
 app.use(express.static(path.join(__dirname, 'public')));
 
 app.get('*', function(req, res, next) {
-    // console.log(req.user)
     res.locals.user = req.user || null;
     next();
 })

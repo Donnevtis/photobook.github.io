@@ -1,16 +1,14 @@
 const express = require('express');
 const router = express.Router();
 const Finder = require('../middleware/findAlbums');
-const app = express();
-let fullname = 'dev env'
-
-
+const path = require('path')
+const fs = require('fs')
 
 router.get('/', function(req, res) {
     if ('user' in req) {
         fullname = req.user.fullname;
     }
-    if (!req.isAuthenticated() && app.get('env') === 'production') {
+    if (!req.isAuthenticated()) {
         res.redirect('/user/login');
     } else {
         let t = Date.now();
@@ -24,17 +22,24 @@ router.get('/', function(req, res) {
                     count += album.count;
                 });
 
+                const script = '/js/' + fs.readdirSync(path.resolve(__dirname, '../public/js')).find(fileName => fileName.match(/script/));
+                const css = '/css/' + fs.readdirSync(path.resolve(__dirname, '../public/css')).find(fileName => fileName.match(/style/));
+
                 res.render('index', {
-                    fullname: fullname,
-                    albums: albums,
-                    count: count
+                    fullname,
+                    albums,
+                    count,
+                    script,
+                    css
                 });
 
             }, err => {
                 if (err) req.flash('error', err || 'database do not answer');
 
                 res.render('index', {
-                    fullname: fullname
+                    fullname,
+                    script,
+                    css
                 })
             })
 
