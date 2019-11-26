@@ -4,7 +4,7 @@
     "description": "Photobook",
     "main": "app.js",
     "scripts": {
-        "start": "nodemon",
+        "start": "node app.js",
         "dev": "webpack --config build/dev.config.js",
         "build": "webpack --config build/build.config.js"
     },
