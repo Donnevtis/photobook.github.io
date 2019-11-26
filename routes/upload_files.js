@@ -49,7 +49,6 @@ router.post('/', function(req, res) {
             Album.findOne({ owner: req.user._id, _id: req.body.id })
                 .then(album => getFiles(album, req.files, req)
                     .then(array => {
-                        console.log(array);
                         console.log(Date.now() - t);
 
                         res.render('cell', { files: array, user: req.user })
@@ -152,7 +151,7 @@ router.post('/', function(req, res) {
         }
 
         values.aperture = e.FNumber ? `F/${e.FNumber}` : undefined;
-        values.exposure = e.ExposureTime ? `1/${1/e.ExposureTime}` : undefined;
+        values.exposure = e.ExposureTime ? `1/${1 / e.ExposureTime}` : undefined;
         values.iso = e.PhotographicSensitivity ? `ISO ${e.PhotographicSensitivity}` : undefined;
         return values;
     }

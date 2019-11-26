@@ -33,21 +33,6 @@ router.get('/*', (req, res) => {
 .delete('/', (req, res) => {
     Albums.findByIdAndDelete(req.body.id)
         .then(album => {
-                Files.find({ album: album._id })
-                    .then(files => findAndDelete(files, req, album)
-                        .then(col => {
-                            if (files.length == col) {
-                                const path = `./users/${req.user.username}/photo/${album._id}`
-                                fs.rmdir(path + '/mini', err => {
-                                    if (err) console.log(err);
-                                    setTimeout(() => {
-                                        fs.rmdir(path, err => {
-                                            if (err) console.log(err);
-                                        })
-                                    }, 1000)
-                                });
-                            }
-                        }))
                 return Files.deleteMany({ album: album._id })
             },
             err => {
@@ -61,28 +46,6 @@ router.get('/*', (req, res) => {
                 res.status(400).send(err)
             })
 })
-
-async function findAndDelete(files, req, album) {
-
-    const match = files.map(async file => {
-        const match = await Files.findOne({ owner: req.user.id, hash: file.hash }).exec();
-        if (match) file = null;
-        return file;
-    })
-
-
-    let matches = await Promise.all(match)
-    matches = matches.filter(item => {
-        return item ? true : false;
-    })
-
-    for await (const file of matches) {
-        fs.unlink('./' + file.originalpath, err => { if (err) console.log(err) })
-        fs.unlink(file.miniature, err => { if (err) console.log(err) })
-    }
-    return matches.length;
-
-}
 
 
 module.exports = router;

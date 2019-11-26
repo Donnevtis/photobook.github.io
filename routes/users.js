@@ -1,16 +1,21 @@
 const express = require('express');
 const router = express.Router();
 const bcrypt = require('bcryptjs');
-const passport = require('passport')
-
-// Bring in User Model
+const passport = require('passport');
+const fs = require('fs');
+const path = require('path')
+    // Bring in User Model
 let User = require('../models/user');
 
-
+const script = '/js/' + fs.readdirSync(path.resolve(__dirname, '../public/js')).find(fileName => fileName.match(/regs/));
+const css = '/css/' + fs.readdirSync(path.resolve(__dirname, '../public/css')).find(fileName => fileName.match(/stylereg/));
 
 //Register Form
 router.get('/', function(req, res, next) {
-    res.render('reg');
+    res.render('reg', {
+        script,
+        css
+    });
 });
 
 // Register Process
@@ -76,7 +81,10 @@ router.post('/', function(req, res, next) {
 
 // Login form
 router.get('/login', function(req, res) {
-    res.render('login');
+    res.render('login', {
+        script: '',
+        css
+    });
 })
 
 // Login process
