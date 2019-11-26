@@ -4,9 +4,9 @@
     "description": "Photobook",
     "main": "app.js",
     "scripts": {
-        "start": "node app.js",
-        "dev": "nodemon",
-        "build": "webpack --mode=production"
+        "start": "nodemon",
+        "dev": "webpack --config build/dev.config.js",
+        "build": "webpack --config build/build.config.js"
     },
     "browserslist": [
         "> 1%",
@@ -51,6 +51,7 @@
         "imagemin-optipng": "^7.1.0",
         "imagemin-svgo": "^7.0.0",
         "imagemin-webpack": "^5.1.0",
+        "imagemin-webpack-plugin": "^2.4.2",
         "mini-css-extract-plugin": "^0.8.0",
         "nodemon-webpack-plugin": "^4.2.1",
         "optimize-css-assets-webpack-plugin": "^5.0.3",
