@@ -135,8 +135,8 @@ if (cluster.isMaster) {
         cluster.fork()
     });
 } else {
-    const listener = app.listen(+port + cluster.worker.id, function() {
+    const listener = app.listen(+port, function() {
 
-        console.log(`Your app is listening on port ${+port + cluster.worker.id}`);
+        console.log(`Your app is listening on port ${+port}`);
     });
 }
