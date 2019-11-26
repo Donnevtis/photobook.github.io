@@ -17,7 +17,7 @@ router.get('/', function(req, res) {
 
                 let count = 0;
                 t = Date.now() - t;
-                console.log(t);
+                console.log('time to download files = ' + t + 'ms');
                 albums.forEach(album => {
                     count += album.count;
                 });

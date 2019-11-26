@@ -1,5 +1,6 @@
 'use strict';
 require('dotenv').config()
+const cluster = require('cluster');
 const express = require('express');
 const path = require('path');
 const port = process.env.PORT || 1337;
@@ -100,7 +101,42 @@ app.use('/redactor', redactor);
 
 // Start server
 app.set('port', process.env.PORT || 1337);
-const listener = app.listen(port, function() {
 
-    console.log(`Your app is listening on port ${port}`);
-});
+const timeouts = [];
+
+function errorMsg(worker, address, code, signal) {
+    console.error('Something must be wrong with the connection ' + worker + ' | ' + address + ' code: ' + code + ' signal: ' + signal);
+}
+
+if (cluster.isMaster) {
+    console.log(`Master ${process.pid} is running`);
+    const cpuCount = require('os').cpus().length;
+    for (let i = 0; i < cpuCount; i++) {
+        cluster.schedulingPolicy = cluster.SCHED_NONE;
+        console.log('scheduling: ' + cluster.schedulingPolicy)
+        cluster.fork()
+    }
+    cluster.on('fork', (worker) => {
+        console.log(worker.id + ' worker online')
+            // timeouts[worker.id] = setTimeout(errorMsg(worker.id, null), 2000);
+    });
+    cluster.on('listening', (worker, address) => {
+        console.log(worker.id + ' is now connect to ' + JSON.stringify(address))
+            // clearTimeout(timeouts[worker.id]);
+    });
+    cluster.on('disconnect', (worker) => {
+        console.log(worker.id + ' is disconnect')
+            // clearTimeout(timeouts[worker.id]);
+    });
+    cluster.on('exit', (worker, code, signal) => {
+        console.log(worker + ' is dead', code, signal)
+            // clearTimeout(timeouts[worker.id]);
+            // errorMsg(worker, null, code, signal);
+        cluster.fork()
+    });
+} else {
+    const listener = app.listen(port, function() {
+
+        console.log(`Your app is listening on port ${port}`);
+    });
+}
