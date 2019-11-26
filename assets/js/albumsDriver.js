@@ -1,4 +1,4 @@
-import { Counters } from './script'
+import { Counters, grid, slider, gridScale, fillLine } from './script'
 import "regenerator-runtime";
 
 class AlbumSet {
@@ -144,13 +144,16 @@ function albumDisplay(e) {
 }
 
 export default class AlbumEnv {
+    constructor(el) {
+
+    }
     getAlbum(e) {
-        const elem = e;
-        let album = elem.parentNode;
-        let id = album.id;
-        let menuLabel = document.getElementsByName(id)[0]
-        let menuInput = menuLabel.firstElementChild;
-        return { id: id, album: album, label: menuLabel };
+        this.elem = e;
+        this.album = this.elem.parentNode;
+        let id = this.album.id;
+        this.menuLabel = document.getElementsByName(id)[0]
+        this.menuInput = this.menuLabel.firstElementChild;
+        return { id, album: this.album, label: this.menuLabel };
     }
     show(e) {
         if (this.elem) {
@@ -159,38 +162,38 @@ export default class AlbumEnv {
         grid();
         albumEnv.getAlbum(e);
         this.elem.classList.add('album__title_active');
-        this.albumGrid = album.lastChild;
-        let count = this.elem.querySelector('.album__count').textContent;
-        this.count = parseInt(count.substring(1));
-        this.cells = albumGrid.children;
+        this.albumGrid = this.album.lastChild;
+        this.count = this.elem.querySelector('.album__count').textContent;
+        this.count = parseInt(this.count.substring(1));
+        this.cells = this.albumGrid.children;
         if (this.count > 18 && this.cells.length != this.count) {
             albumEnv.getFiles();
         }
         this.startValue = slider.value;
         slider.removeEventListener('input', grid);
-        slider.addEventListener('input', albumEnv.scale);
+        slider.addEventListener('input', this.scale.bind(this));
         const input = new Event('input');
         slider.dispatchEvent(input);
-        menuInput.checked = true;
+        this.menuInput.checked = true;
         const click = new Event('click');
-        menuLabel.dispatchEvent(click);
+        this.menuLabel.dispatchEvent(click);
 
         const link = this.elem.previousSibling.name;
         document.location.href = `#${link}i`
 
-        return;
+
     }
     scale(e) {
         this.val = e.target.value;
-        this.size = gridScale(val);
+        let size = gridScale(this.val);
 
-        for (cell of this.cells) {
+        for (let cell of this.cells) {
             cell.style.display = "block";
         }
-        let r = (count / size.col);
+        let r = (this.count / size.col);
         r = Math.ceil(r);
-        albumGrid.style.gridTemplateColumns = `repeat(${size.col},1fr)`;
-        albumGrid.style.gridTemplateRows = `repeat(${r} ,${size.vw}vw)`;
+        this.albumGrid.style.gridTemplateColumns = `repeat(${size.col},1fr)`;
+        this.albumGrid.style.gridTemplateRows = `repeat(${r} ,${size.vw}vw)`;
     }
     getFiles() {
         const url = `/album/${this.id}`;
@@ -213,7 +216,7 @@ export default class AlbumEnv {
         slider.addEventListener('input', grid);
         slider.value = +grid();
         fillLine.style.width = slider.value + 'px';
-        menuInput.checked = false;
+        this.menuInput.checked = false;
     }
 }
 const albumEnv = new AlbumEnv;

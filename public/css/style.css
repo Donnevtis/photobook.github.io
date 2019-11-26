@@ -425,7 +425,7 @@
         width: 20px;
         height: 20px;
         margin-left: 20px;
-        background-image: url("../svg/Smaller_icon1.svg");
+        background-image: url(/svg/Smaller_icon1.svg);
     }
     
     .scale__grid-large {
@@ -433,7 +433,7 @@
         width: 20px;
         height: 20px;
         margin-right: 20px;
-        background-image: url("../svg/Bigger_icon.svg");
+        background-image: url(/svg/Bigger_icon.svg);
     }
     
     .scale__slider {

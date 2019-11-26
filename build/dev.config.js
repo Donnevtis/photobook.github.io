@@ -40,7 +40,7 @@ const devWebpackConfig = merge(baseWebpackConfig, {
     plugins: [
         new NodemonPlugin({
             script: './app.js',
-            watch: './app.js',
+            // watch: path.resolve('./'),
         }),
 
     ]

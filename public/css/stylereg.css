@@ -1,0 +1,210 @@
+    @charset "UTF-8";
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        text-transform: none;
+        -webkit-font-smoothing: antialiased;
+        text-decoration: none;
+        text-rendering: optimizeLegibility;
+        -webkit-font-smoothing: subpixel-antialiased;
+        user-select: none;
+    }
+    
+     ::-webkit-scrollbar {
+        position: absolute;
+        width: 8px;
+    }
+    
+     ::-webkit-scrollbar-track {
+        visibility: hidden;
+    }
+    
+     ::-webkit-scrollbar-thumb {
+        background: #e1e1e1;
+        border-radius: 5px;
+    }
+    
+     ::-webkit-scrollbar-thumb:hover {
+        background: rgb(121, 121, 121);
+    }
+    
+    html {
+        font-stretch: 100%;
+        font-style: normal;
+        font-variant-caps: normal;
+        font-variant-east-asian: normal;
+        font-variant-ligatures: normal;
+        font-variant-numeric: normal;
+        overflow-x: hidden;
+    }
+    
+    body {
+        width: auto;
+        position: relative;
+        display: flex;
+        flex-direction: row;
+        margin-left: 220px;
+        font-family: "Helvetica neue";
+        color: #e1e1e1;
+        letter-spacing: 1px;
+    }
+    
+    div {
+        display: block;
+    }
+    
+    button,
+    input {
+        border: none;
+        text-decoration: none;
+        outline: none;
+        cursor: pointer;
+        background-color: transparent;
+        vertical-align: middle;
+        font-family: 'Helvetica Neue'
+    }
+    
+    a:link {
+        color: #3e3d41;
+    }
+    
+    a:visited {
+        color: #a3a2a8;
+    }
+    
+    a:hover {
+        color: #a3a2a8;
+    }
+    
+    a:active {
+        color: #a3a2a8;
+    }
+    /* sidebar */
+    
+    .sidebar {
+        display: block;
+        background-color: rgb(30, 29, 38);
+        position: fixed;
+        left: 0px;
+        top: 0;
+        width: 220px;
+        height: 100%;
+        z-index: 2;
+    }
+    
+    .form-popup {
+        display: block;
+        position: absolute;
+        z-index: 20px;
+        left: 200px;
+        width: auto;
+        padding: 5px;
+        background: rgba(99, 78, 92, 0.377);
+        border-radius: 5px;
+        font-size: 14px;
+        line-height: initial;
+    }
+    
+    .server-popup {
+        display: block;
+        position: absolute;
+        z-index: 20px;
+        width: auto;
+        top: 55%;
+        padding: 15px;
+        margin: 0 10px;
+        background-color: rgba(88, 21, 33, 0.377);
+        border-radius: 5px;
+        font-size: 18px;
+        line-height: initial;
+    }
+    
+    .form-signup {
+        margin: 25px;
+    }
+    
+    .form-signup__title {
+        font-size: 30px;
+        font-weight: bold;
+        margin-bottom: 30px;
+    }
+    
+    .form-signup__input {
+        border-bottom: 1px solid gray;
+        width: 100%;
+        color: #e1e1e1;
+        cursor: text;
+        margin: 30px 0 5px;
+    }
+    
+    .form-signup__input::placeholder {
+        font-size: 16px;
+    }
+    
+    .form-signup__checkbox {
+        display: block;
+        margin: 10px 0;
+        width: 100%;
+    }
+    
+    .form-signup__checkbox {
+        font-size: 10px;
+        letter-spacing: 0.5px;
+    }
+    
+    .wrong:focus {
+        background-color: initial;
+    }
+    
+    .buttons {
+        height: 100px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        margin: 20px 0;
+    }
+    
+    .signup {
+        display: block;
+        border-radius: 20px;
+        background-color: rgb(234, 90, 90);
+        box-shadow: 0px 0px 10px 0px rgba(0, 0, 0, 0.35);
+        position: relative;
+        width: 160px;
+        height: 36px;
+        z-index: 3;
+        font-size: 15px;
+        color: rgba(255, 255, 255, 0.801);
+        text-transform: uppercase;
+        margin: 0 auto;
+    }
+    
+    .signup:disabled {
+        opacity: 0.6;
+    }
+    
+    .signin {
+        display: block;
+        border-radius: 20px;
+        position: relative;
+        width: 160px;
+        height: 36px;
+        z-index: 3;
+        font-size: 15px;
+        font-family: "Helvetica Neue";
+        text-transform: lowercase;
+        margin: 0 auto;
+        color: #e1e1e1;
+        text-align: center;
+    }
+    /* content */
+    
+    .background {
+        width: 100vw;
+        height: 100vh;
+        background-image: url(/img/background.jpg);
+        background-position: center;
+        background-repeat: no-repeat;
+        background-size: cover;
+    }

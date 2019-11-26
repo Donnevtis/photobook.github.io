@@ -1,6 +1,6 @@
 import { albumsEvensHang } from './albumsDriver'
 
-const slider = document.querySelector('.scale__slider'),
+export const slider = document.querySelector('.scale__slider'),
     fillLine = document.querySelector('.scale_slider-fill'),
     sidebarButton = document.querySelector('.sidebar-button'),
     sidebar = document.querySelector('.sidebar'),
@@ -66,12 +66,12 @@ if (FIREFOX) {
 }
 
 //scale grid
-const grid = setGrid();
+export const grid = setGrid();
 
 slider.addEventListener('input', grid);
 window.onload = grid();
 
-function gridScale(val) {
+export function gridScale(val) {
     const size = {};
     switch (val) {
         case '0':
@@ -152,29 +152,6 @@ function setGrid(e) {
         return val;
     }
 
-}
-
-//mobile version sidebar hider
-
-sidebarButton.addEventListener('click', openSidebar);
-
-function openSidebar() {
-
-    sidebar.classList.add('sidebar_hide');
-    content.style.display = 'flex';
-
-    sidebarButton.removeEventListener('click', openSidebar);
-    sidebarButton.addEventListener('click', closeSidebar);
-}
-
-function closeSidebar() {
-
-
-    sidebar.classList.remove('sidebar_hide');
-    content.style.display = 'none';
-
-    sidebarButton.removeEventListener('click', closeSidebar);
-    sidebarButton.addEventListener('click', openSidebar);
 }
 
 //upload files show area
@@ -343,10 +320,10 @@ function showAlbum(title, res) {
     container.innerHTML = res;
     const id = container.firstChild.id;
     container.querySelector('.album__anchor').name = albumNumber;
-    const albumGrid = container.querySelector('.album__grid');
+    this.albumGrid = container.querySelector('.album__grid');
     albumsEvensHang(container.firstChild);
     actions.after(container.firstChild);
-    addUploadAreas(albumGrid);
+    addUploadAreas(this.albumGrid);
     photoGrid = document.querySelectorAll('.album__grid');
 
     // Menu item

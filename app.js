@@ -99,6 +99,12 @@ app.use('/album', album);
 let redactor = require('./routes/redactor')
 app.use('/redactor', redactor);
 
+// Redirect the other routes
+app.get('*', function(req, res, next) {
+    res.redirect('/')
+
+})
+
 // Start server
 app.set('port', process.env.PORT || 1337);
 
