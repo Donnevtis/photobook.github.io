@@ -208,3 +208,83 @@
         background-repeat: no-repeat;
         background-size: cover;
     }
+    
+    @media screen and (max-width: 425px) {
+        .background {
+            background-image: url('../img/background/1920x1200.jpg');
+        }
+        .sidebar-button {
+            display: block;
+        }
+        body {
+            font-size-adjust: 100%;
+            margin: 0;
+        }
+        .sidebar-wrapper {
+            background-color: rgb(30, 29, 38);
+            height: auto;
+            overflow-y: auto;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            z-index: 1;
+            position: fixed;
+        }
+        .sidebar {
+            position: relative;
+            width: 100vw;
+            height: auto;
+            transition: transform .3s ease;
+        }
+        .scale {
+            display: none;
+        }
+        .top {
+            height: 200px;
+            display: grid;
+            justify-items: center;
+            align-items: center;
+        }
+        .profile__name {
+            justify-self: start;
+            margin: 0;
+            top: 25px;
+            grid-column-start: 2;
+            grid-row-start: 1;
+        }
+        .profile__count {
+            justify-self: start;
+            grid-column-start: 2;
+            grid-row-start: 1;
+            top: 43px;
+        }
+        .upload-button {
+            grid-row-start: 2;
+            grid-column: 1/ span 2;
+            top: 0px;
+            width: 160px;
+            height: 36px;
+        }
+        .menu__options_sticky {
+            overflow-y: unset;
+        }
+        .content {
+            display: block;
+            position: absolute;
+            width: 100vw;
+            height: auto;
+        }
+        .content_mobile-show {
+            z-index: 3;
+        }
+        .album__grid {
+            position: relative;
+            z-index: -5;
+            display: grid;
+            justify-content: start;
+            grid-gap: 20px 10px;
+            grid-template-columns: repeat(4, 1fr);
+            grid-template-rows: repeat(2, 12.5vw);
+            width: 100%;
+        }
+    }

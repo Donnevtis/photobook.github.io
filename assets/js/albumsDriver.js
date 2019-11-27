@@ -1,4 +1,4 @@
-import { Counters, grid, slider, gridScale, fillLine } from './script'
+import { Counters, grid, slider, gridScale, fillLine, content } from './script'
 import "regenerator-runtime";
 
 class AlbumSet {
@@ -158,10 +158,12 @@ export default class AlbumEnv {
     show(e) {
         if (this.elem) {
             this.elem.classList.remove('album__title_active');
+
         }
         grid();
         albumEnv.getAlbum(e);
         this.elem.classList.add('album__title_active');
+        content.classList.add('content_mobile-show');
         this.albumGrid = this.album.lastChild;
         this.count = this.elem.querySelector('.album__count').textContent;
         this.count = parseInt(this.count.substring(1));
@@ -175,23 +177,23 @@ export default class AlbumEnv {
         const input = new Event('input');
         slider.dispatchEvent(input);
         this.menuInput.checked = true;
-        const click = new Event('click');
-        this.menuLabel.dispatchEvent(click);
+        // const click = new Event('click');
+        // this.menuLabel.dispatchEvent(click);
 
         const link = this.elem.previousSibling.name;
         document.location.href = `#${link}i`
-
+        history.pushState({}, null, '/');
 
     }
     scale(e) {
         this.val = e.target.value;
-        let size = gridScale(this.val);
+        let size = window.screen.width < 425 ? { col: 1, vw: 60 } : gridScale(this.val);
 
         for (let cell of this.cells) {
             cell.style.display = "block";
         }
-        let r = (this.count / size.col);
         r = Math.ceil(r);
+        let r = (this.count / size.col);
         this.albumGrid.style.gridTemplateColumns = `repeat(${size.col},1fr)`;
         this.albumGrid.style.gridTemplateRows = `repeat(${r} ,${size.vw}vw)`;
     }
@@ -212,6 +214,7 @@ export default class AlbumEnv {
     }
     hide(e) {
         this.elem.classList.toggle('album__title_active');
+        content.classList.remove('content_mobile-show');
         slider.removeEventListener('input', albumEnv.scale);
         slider.addEventListener('input', grid);
         slider.value = +grid();
@@ -232,7 +235,30 @@ export function albumsEvensHang(elem) {
         label.addEventListener('click', albumDisplay, false);
         label.addEventListener('mouseleave', albumSet.close);
     })
+
     albumSettings.forEach(img => {
         img.addEventListener('click', albumSet.open);
-    })
+    });
+
+    (function setChooseEvent() {
+        const menuOptions = elem.querySelectorAll('.menu__selector');
+        menuOptions.forEach(label => {
+            label.addEventListener('click', chooseAlbum, false);
+
+        });
+
+    })();
+
+    function chooseAlbum(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        const albumNames = elem.querySelectorAll('.album__title');
+        albumNames.find = [].find;
+        const album = albumNames.find(label => label.firstChild.innerText == this.innerText)
+        const click = new Event('click', { bubbles: false, cancelable: false });
+        album.dispatchEvent(click)
+        const link = this.id.match(/\d/g).join()
+        document.location.href = `#${link}`
+        history.pushState({}, null, '/');
+    }
 }

@@ -1,7 +1,8 @@
 extends layout
 
 block content 
-  body  
+  body 
+    .sidebar-wrapper 
       .sidebar
         != messages('messages', locals)        
         form.form-signup(method='POST' action='/user/login')

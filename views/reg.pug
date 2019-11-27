@@ -1,23 +1,24 @@
 extends layout
 
 block content 
-  body  
-    .sidebar
-      != messages('messages', locals) 
-      form.form-signup(method='POST' action='/user')
-        .form-signup__title Sign up
-          input.form-signup__input(type='text' name='fullname' placeholder='Fullname...' required value=fullname)
-          input.form-signup__input(type='text' name='username' placeholder='Username...' required minlength='3' value=username)
-          input.form-signup__input(type='email' name='email' placeholder='Email address...' required value=email)
-          input.form-signup__input(type='password', name='password' placeholder='Password...' required minlength='6')
-          input.form-signup__input(type='password', name='password2' placeholder='Confirm password...' required)
-          label.form-signup__checkbox
-            input(type='checkbox' name='checkbox' required)
-            |  I agree to the             
-            a(href='#')
-              b Terms of user
-        .buttons
-          input.signup(type='submit' , value='Sign up')            
-          a.signin(href='/user/login') Sign in →      
-    .background
+  body
+    .sidebar-wrapper  
+      .sidebar
+        != messages('messages', locals) 
+        form.form-signup(method='POST' action='/user')
+          .form-signup__title Sign up
+            input.form-signup__input(type='text' name='fullname' placeholder='Fullname...' required value=fullname)
+            input.form-signup__input(type='text' name='username' placeholder='Username...' required minlength='3' value=username)
+            input.form-signup__input(type='email' name='email' placeholder='Email address...' required value=email)
+            input.form-signup__input(type='password', name='password' placeholder='Password...' required minlength='6')
+            input.form-signup__input(type='password', name='password2' placeholder='Confirm password...' required)
+            label.form-signup__checkbox
+              input(type='checkbox' name='checkbox' required)
+              |  I agree to the             
+              a(href='#')
+                b Terms of user
+          .buttons
+            input.signup(type='submit' , value='Sign up')            
+            a.signin(href='/user/login') Sign in →      
+      .background
     

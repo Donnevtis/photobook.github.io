@@ -1,5 +1,6 @@
 import { albumsEvensHang } from './albumsDriver'
 
+
 export const slider = document.querySelector('.scale__slider'),
     fillLine = document.querySelector('.scale_slider-fill'),
     sidebarButton = document.querySelector('.sidebar-button'),
@@ -110,6 +111,7 @@ export function gridScale(val) {
 
 function setGrid(e) {
     let val = '50';
+    if (window.screen.width < 425) return () => {};
     return function(e) {
         // removeArea();
         val = (typeof(e) == 'object') ? e.target.value : val;
@@ -155,9 +157,15 @@ function setGrid(e) {
 }
 
 //upload files show area
-uploadButton.addEventListener('click', showArea);
+if ("ontouchstart" in document.documentElement) {
+    uploadButton.setAttribute('type', 'file')
+
+} else uploadButton.addEventListener('click', showArea);
+
+
 
 function showArea() {
+
     photoGrid.forEach((elem) => { addUploadAreas(elem) });
     uploadButton.removeEventListener('click', showArea);
     uploadButton.addEventListener('click', removeArea);
@@ -320,10 +328,10 @@ function showAlbum(title, res) {
     container.innerHTML = res;
     const id = container.firstChild.id;
     container.querySelector('.album__anchor').name = albumNumber;
-    this.albumGrid = container.querySelector('.album__grid');
+    const albumGrid = container.querySelector('.album__grid');
     albumsEvensHang(container.firstChild);
     actions.after(container.firstChild);
-    addUploadAreas(this.albumGrid);
+    addUploadAreas(albumGrid);
     photoGrid = document.querySelectorAll('.album__grid');
 
     // Menu item

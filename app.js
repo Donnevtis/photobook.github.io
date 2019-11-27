@@ -114,7 +114,7 @@ function errorMsg(worker, address, code, signal) {
     console.error('Something must be wrong with the connection ' + worker + ' | ' + address + ' code: ' + code + ' signal: ' + signal);
 }
 
-if (cluster.isMaster) {
+if (cluster.isMaster && process.env === 'production') {
     console.log(`Master ${process.pid} is running`);
     const cpuCount = require('os').cpus().length;
     for (let i = 0; i < cpuCount; i++) {
