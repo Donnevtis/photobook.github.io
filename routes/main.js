@@ -9,6 +9,8 @@ router.get('/', function(req, res) {
     const script = '/js/' + fs.readdirSync(path.resolve(__dirname, '../public/js')).find(fileName => fileName.match(/script/));
     const css = '/css/' + fs.readdirSync(path.resolve(__dirname, '../public/css')).find(fileName => fileName.match(/style/));
 
+
+
     if ('user' in req) {
         fullname = req.user.fullname;
     }
@@ -45,6 +47,7 @@ router.get('/', function(req, res) {
                     css
                 })
             })
+
 
     }
 

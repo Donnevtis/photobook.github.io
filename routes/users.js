@@ -88,7 +88,7 @@ router.get('/login', function(req, res) {
 })
 
 // Login process
-router.post('/login', (req, res, next) => auth(req, res, next))
+router.post('/login', (req, res, next) => auth(req, res, next), (req, res) => res.redirect('/'))
 
 // Logout   
 router.get('/logout', function(req, res) {
@@ -98,7 +98,9 @@ router.get('/logout', function(req, res) {
 
 // Authenticate function
 function auth(req, res, next) {
+
     passport.authenticate('local', {
+        // session: false
         successRedirect: '/',
         failureRedirect: '/user/login',
         failureFlash: true

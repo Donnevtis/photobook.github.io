@@ -31,8 +31,9 @@ app.use(session({
         httpOnly: true,
         maxAge: 7 * 24 * 60 * 60 * 1000
     },
-    resave: false,
-    saveUninitialized: true,
+    resave: true,
+    rolling: true,
+    saveUninitialized: false,
     store: sessionStore
 }));
 
@@ -48,6 +49,7 @@ require('./config/passport')(passport);
 // Passport middleware
 app.use(passport.initialize());
 app.use(passport.session());
+
 
 // Load View Engine
 app.set('views', path.join(__dirname, 'views'));

@@ -1,6 +1,5 @@
 const LocalStrategy = require('passport-local').Strategy;
 const User = require('../models/user');
-// const config = require('../config/database');
 const bcrypt = require('bcryptjs');
 
 module.exports = function(passport) {
@@ -36,5 +35,8 @@ module.exports = function(passport) {
         User.findById(id, function(err, user) {
             done(err, user);
         });
+
     });
+
+
 }

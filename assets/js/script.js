@@ -157,18 +157,20 @@ function setGrid(e) {
 }
 
 //upload files show area
-if ("ontouchstart" in document.documentElement) {
-    uploadButton.setAttribute('type', 'file')
 
-} else uploadButton.addEventListener('click', showArea);
+uploadButton.addEventListener('click', showArea, { once: true });
 
 
 
-function showArea() {
+function showArea(e) {
+    e.preventDefault();
+    if ("ontouchstart" in document.documentElement) {
+        uploadButton.nextSibling.click();
+        return;
+    }
 
     photoGrid.forEach((elem) => { addUploadAreas(elem) });
-    uploadButton.removeEventListener('click', showArea);
-    uploadButton.addEventListener('click', removeArea);
+    uploadButton.addEventListener('click', removeArea, { once: true });
 }
 
 function addUploadAreas(elem) {
@@ -262,12 +264,13 @@ function setDragDrop(elem, url, callback, title) {
 }
 
 
-function removeArea() {
+function removeArea(e) {
+    e.preventDefault()
     areas.forEach((elem) => {
         elem.remove();
     })
     areas = [];
-    uploadButton.addEventListener('click', showArea);
+    uploadButton.addEventListener('click', showArea, { once: true });
 }
 
 //NEW ALBUM CREATE
