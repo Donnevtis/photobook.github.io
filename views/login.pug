@@ -7,8 +7,8 @@ block content
         != messages('messages', locals)        
         form.form-signup(method='POST' action='/user/login')
           .form-signup__title Sign in         
-          input.form-signup__input(type='text', name='username', placeholder='Username...')           
-          input.form-signup__input(type='password', name='password', placeholder='Password...')          
+          input.form-signup__input(type='text', name='username', placeholder='Username...', value='don')           
+          input.form-signup__input(type='password', name='password', placeholder='Password...', value='123123')          
           .buttons
             input.signup(type='submit', value='Sign in')            
             a.signin(href="/user") Sign up →
