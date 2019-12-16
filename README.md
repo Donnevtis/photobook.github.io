@@ -13,6 +13,7 @@
 
 Стек:
   -Node.js;
+  -Express.js;
   -шаблонизатор Pug;
   -библиотека для аутентификации Passport.js
   -база данных MongoDB (Atlas) и библиотека Mongoose;
